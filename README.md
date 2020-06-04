@@ -1,2 +1,4 @@
-# fullstack-open-ex0
-Part 0 of the Fullstack Open course
+# fullstack-open-exercises
+## Author: Paweł Mendroch
+
+Exercises for the Fullstack Open course by the University of Helsinki
