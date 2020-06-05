@@ -4,7 +4,9 @@ import Person from "./Person";
 const Numbers = ({ persons, filterName }) => (
   <div>
     {persons
-      .filter((person) => person.name.toLowerCase().includes(filterName))
+      .filter((person) =>
+        person.name.toLowerCase().includes(filterName.toLowerCase())
+      )
       .map((person) => (
         <Person key={person.id} person={person} />
       ))}
