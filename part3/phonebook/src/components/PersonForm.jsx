@@ -9,10 +9,12 @@ const PersonForm = ({
 }) => (
   <form onSubmit={personOnSubmit}>
     <div>
-      name: <input value={newName} onChange={nameOnChange} />
+      name:
+      <input value={newName} onChange={nameOnChange} />
     </div>
     <div>
-      number: <input value={newNumber} onChange={numberOnChange} />
+      number:
+      <input value={newNumber} onChange={numberOnChange} />
     </div>
     <div>
       <button type="submit">add</button>

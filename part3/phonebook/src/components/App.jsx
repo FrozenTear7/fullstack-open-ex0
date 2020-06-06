@@ -12,6 +12,13 @@ const App = () => {
   const [filterName, setFilterName] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
 
+  const setErrorMessageTemp = (message) => {
+    setErrorMessage(message);
+    setTimeout(() => {
+      setErrorMessage(null);
+    }, 5000);
+  };
+
   useEffect(() => {
     personsService
       .getAllPersons()
@@ -26,13 +33,6 @@ const App = () => {
         console.log("Could not fetch persons", error);
       });
   }, []);
-
-  const setErrorMessageTemp = (message) => {
-    setErrorMessage(message);
-    setTimeout(() => {
-      setErrorMessage(null);
-    }, 5000);
-  };
 
   const nameOnChange = (e) => {
     setNewName(e.target.value);
@@ -49,68 +49,28 @@ const App = () => {
   const personOnSubmit = (e) => {
     e.preventDefault();
 
-    const personExists = persons.find((person) => person.name === newName);
-
-    if (personExists) {
-      if (
-        window.confirm(`${newName} is already added to phonebook, 
-      replace the old number with a new one?`)
-      ) {
-        const updatedPerson = { ...personExists, number: newNumber };
-
-        personsService
-          .updatePerson(updatedPerson)
-          .then(() => {
-            setPersons(
-              persons.map((person) => {
-                if (person.id === personExists.id) {
-                  return updatedPerson;
-                } else {
-                  return person;
-                }
-              })
-            );
-            setErrorMessageTemp({
-              message: `Successfully updated ${updatedPerson.name}'s number`,
-              isPositive: true,
-            });
-            setNewName("");
-            setNewNumber("");
-          })
-          .catch((error) => {
-            setErrorMessageTemp({
-              message: `Could not update ${personExists.name}'s number`,
-              isPositive: false,
-            });
-            console.log(
-              `Could not update ${personExists.name}'s number`,
-              error
-            );
-          });
-      }
-    } else {
-      personsService
-        .createPerson({ name: newName, number: newNumber })
-        .then((response) => {
-          setPersons([...persons, response.data]);
-          setErrorMessageTemp({
-            message: `Successfully create ${newName}'s number`,
-            isPositive: true,
-          });
-          setNewName("");
-          setNewNumber("");
-        })
-        .catch((error) => {
-          setErrorMessageTemp({
-            message: `Could not add ${newName}`,
-            isPositive: false,
-          });
-          console.log(`Could not add ${newName}`, error);
+    personsService
+      .createPerson({ name: newName, number: newNumber })
+      .then((response) => {
+        setPersons([...persons, response.data]);
+        setErrorMessageTemp({
+          message: `Successfully create ${newName}'s number`,
+          isPositive: true,
         });
-    }
+        setNewName("");
+        setNewNumber("");
+      })
+      .catch((error) => {
+        setErrorMessageTemp({
+          message: `Could not add ${newName}`,
+          isPositive: false,
+        });
+        console.log(`Could not add ${newName}`, error);
+      });
   };
 
   const personDeleteOnClick = (personDelete) => {
+    // eslint-disable-next-line no-alert
     if (window.confirm(`Delete ${personDelete.name}`)) {
       personsService
         .deletePerson(personDelete.id)
