@@ -3,12 +3,14 @@ import Persons from "./Persons";
 import Filter from "./Filter";
 import PersonForm from "./PersonForm";
 import personsService from "../services/persons";
+import Notification from "./Notification";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filterName, setFilterName] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     personsService
@@ -17,9 +19,20 @@ const App = () => {
         setPersons(response.data);
       })
       .catch((error) => {
+        setErrorMessageTemp({
+          message: `Could not fetch persons`,
+          isPositive: false,
+        });
         console.log("Could not fetch persons", error);
       });
   }, []);
+
+  const setErrorMessageTemp = (message) => {
+    setErrorMessage(message);
+    setTimeout(() => {
+      setErrorMessage(null);
+    }, 5000);
+  };
 
   const nameOnChange = (e) => {
     setNewName(e.target.value);
@@ -57,10 +70,18 @@ const App = () => {
                 }
               })
             );
+            setErrorMessageTemp({
+              message: `Successfully updated ${updatedPerson.name}'s number`,
+              isPositive: true,
+            });
             setNewName("");
             setNewNumber("");
           })
           .catch((error) => {
+            setErrorMessageTemp({
+              message: `Could not update ${personExists.name}'s number`,
+              isPositive: false,
+            });
             console.log(
               `Could not update ${personExists.name}'s number`,
               error
@@ -72,10 +93,18 @@ const App = () => {
         .createPerson({ name: newName, number: newNumber })
         .then((response) => {
           setPersons([...persons, response.data]);
+          setErrorMessageTemp({
+            message: `Successfully create ${newName}'s number`,
+            isPositive: true,
+          });
           setNewName("");
           setNewNumber("");
         })
         .catch((error) => {
+          setErrorMessageTemp({
+            message: `Could not add ${newName}`,
+            isPositive: false,
+          });
           console.log(`Could not add ${newName}`, error);
         });
     }
@@ -87,8 +116,16 @@ const App = () => {
         .deletePerson(personDelete.id)
         .then(() => {
           setPersons(persons.filter((person) => person.id !== personDelete.id));
+          setErrorMessageTemp({
+            message: `Successfully deleted ${personDelete.name}`,
+            isPositive: true,
+          });
         })
         .catch((error) => {
+          setErrorMessageTemp({
+            message: `Could not delete ${personDelete.name}`,
+            isPositive: false,
+          });
           console.log(`Could not delete ${personDelete.name}`, error);
         });
     }
@@ -97,8 +134,8 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
+      <Notification errorMessage={errorMessage} />
       <Filter filterName={filterName} filterOnChange={filterOnChange} />
-
       <h2>Add a new person</h2>
       <PersonForm
         newName={newName}
