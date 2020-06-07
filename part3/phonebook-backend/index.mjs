@@ -21,6 +21,7 @@ app.use(
 );
 
 mongoose.set("useFindAndModify", false);
+mongoose.set("useCreateIndex", true);
 
 app.get("/api/info", (req, res, next) => {
   Person.find({})
@@ -62,8 +63,13 @@ app.get("/api/persons/:id", (req, res, next) => {
 
 app.put("/api/persons/:id", (req, res, next) => {
   const { body } = req;
+  console.log(body);
 
-  Person.findByIdAndUpdate(req.params.id, body)
+  Person.findByIdAndUpdate(
+    req.params.id,
+    { $set: { name: body.name, number: body.number } },
+    { runValidators: true, context: "query" }
+  )
     .then((result) => {
       res.status(200).json(result);
     })
@@ -83,14 +89,13 @@ const unknownEndpoint = (request, response) => {
 };
 
 const errorHandler = (error, request, response, next) => {
-  console.log(error.name);
-  console.error(error.message);
+  console.error(error.name, error.message);
 
   if (error.name === "CastError") {
     return response.status(400).send({ error: "Malformatted id" });
   }
   if (error.name === "ValidationError") {
-    return response.status(400).send({ error: "Valid data is required" });
+    return response.status(400).send({ error: error.message });
   }
 
   return next(error);
