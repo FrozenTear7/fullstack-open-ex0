@@ -16,6 +16,7 @@
     "react/jsx-one-expression-per-line": "off"
   },
   "globals": {
-    "window": true
+    "window": true,
+    "document": true
   }
 }
