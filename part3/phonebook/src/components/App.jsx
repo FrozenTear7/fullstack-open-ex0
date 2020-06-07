@@ -71,11 +71,12 @@ const App = () => {
           setNewNumber("");
         })
         .catch((error) => {
+          error = error.response.data.error;
           setErrorMessageTemp({
-            message: `Could not update ${newName}'s number`,
+            message: `Could not update ${newName}'s number, ${error}`,
             isPositive: false,
           });
-          console.log(`Could not update ${newName}'s number`, error);
+          console.log(`Could not update ${newName}'s number, ${error}`);
         });
     } else {
       personsService
@@ -90,11 +91,12 @@ const App = () => {
           setNewNumber("");
         })
         .catch((error) => {
+          error = error.response.data.error;
           setErrorMessageTemp({
-            message: `Could not add ${newName}`,
+            message: `Could not add ${newName}, ${error}`,
             isPositive: false,
           });
-          console.log(`Could not add ${newName}`, error);
+          console.log(`Could not add ${newName}, ${error}`);
         });
     }
   };
