@@ -4,12 +4,14 @@
   "rules": {
     "prettier/prettier": ["error", {
      "endOfLine": "auto",
-     "singleQuote": true
+     "singleQuote": true,
+     "semi": false
    }],
     "no-console": 0,
     "no-underscore-dangle": "off",
     "no-param-reassign": "off",
     "import/first": "off",
-    "quotes": ["error", "single"]
+    "quotes": ["error", "single"],
+    "semi": ["error", "never"]
   }
 }

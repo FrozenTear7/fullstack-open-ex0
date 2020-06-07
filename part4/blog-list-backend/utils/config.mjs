@@ -1,10 +1,10 @@
-import dotenv from 'dotenv';
+import dotenv from 'dotenv'
 
-dotenv.config({ silent: true });
+dotenv.config({ silent: true })
 
-const { PORT, MONGODB_URI } = process.env;
+const { PORT, MONGODB_URI } = process.env
 
 export default {
   MONGODB_URI,
   PORT,
-};
+}
