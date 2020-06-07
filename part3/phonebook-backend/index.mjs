@@ -20,70 +20,84 @@ app.use(
   )
 );
 
-mongoose.connect(process.env.DB_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+mongoose.set("useFindAndModify", false);
+
+app.get("/api/info", (req, res, next) => {
+  Person.find({})
+    .then((result) => {
+      res.send(
+        `<div>Phonebook has info for ${
+          result.length
+        } people<br />${new Date().toLocaleString()}</div>`
+      );
+    })
+    .catch((error) => next(error));
 });
 
-app.get("/", (req, res) => {
-  res.send("<h1>Hello World!</h1>");
+app.get("/api/persons", (req, res, next) => {
+  Person.find({})
+    .then((result) => {
+      res.status(200).json(result);
+    })
+    .catch((error) => next(error));
 });
 
-app.get("/info", (req, res) => {
-  Person.find({}, (err, result) => {
-    if (err) res.status(404).json({ error: `Could not fetch persons` });
-
-    res.send(
-      `<div>Phonebook has info for ${
-        result.length
-      } people<br />${new Date().toLocaleString()}</div>`
-    );
-  });
-});
-
-app.get("/api/persons", (req, res) => {
-  Person.find({}, (err, result) => {
-    if (err) res.status(404).json({ error: `Could not fetch persons` });
-
-    res.status(200).json(result);
-  });
-});
-
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
   const { body } = req;
 
-  if (!body || !body.name || !body.number) {
-    res.status(404).json({ error: "Please provide valid name and number" });
-  } else {
-    Person.create({ name: body.name, number: body.number }, (err, result) => {
-      if (err) res.status(404).json({ error: `Could not create ${body.name}` });
-
+  Person.create({ name: body.name, number: body.number })
+    .then((result) => {
       res.status(201).json(result);
-    });
+    })
+    .catch((error) => next(error));
+});
+
+app.get("/api/persons/:id", (req, res, next) => {
+  Person.findById(req.params.id)
+    .then((result) => {
+      res.status(200).json(result);
+    })
+    .catch((error) => next(error));
+});
+
+app.put("/api/persons/:id", (req, res, next) => {
+  const { body } = req;
+
+  Person.findByIdAndUpdate(req.params.id, body)
+    .then((result) => {
+      res.status(200).json(result);
+    })
+    .catch((error) => next(error));
+});
+
+app.delete("/api/persons/:id", (req, res, next) => {
+  Person.findByIdAndRemove(req.params.id)
+    .then(() => {
+      res.status(204).end();
+    })
+    .catch((error) => next(error));
+});
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: "unknown endpoint" });
+};
+
+const errorHandler = (error, request, response, next) => {
+  console.log(error.name);
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "Malformatted id" });
   }
-});
+  if (error.name === "ValidationError") {
+    return response.status(400).send({ error: "Valid data is required" });
+  }
 
-app.get("/api/persons/:id", (req, res) => {
-  Person.find({ id: req.params.id }, (err, result) => {
-    if (err)
-      res
-        .status(404)
-        .json({ error: `Could not find person with id: ${req.params.id}` });
+  return next(error);
+};
 
-    res.status(200).json(result);
-  });
-});
-
-app.delete("/api/persons/:id", (req, res) => {
-  Person.findOneAndRemove({ _id: req.params.id }, (err) => {
-    if (err)
-      res
-        .status(404)
-        .json({ error: `Could not delete person with id: ${req.params.id}` });
-
-    res.status(204).end();
-  });
-});
+app.use(unknownEndpoint);
+app.use(errorHandler);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);

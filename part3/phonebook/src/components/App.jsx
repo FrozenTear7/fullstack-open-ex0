@@ -49,24 +49,54 @@ const App = () => {
   const personOnSubmit = (e) => {
     e.preventDefault();
 
-    personsService
-      .createPerson({ name: newName, number: newNumber })
-      .then((response) => {
-        setPersons([...persons, response.data]);
-        setErrorMessageTemp({
-          message: `Successfully create ${newName}'s number`,
-          isPositive: true,
+    const existingPerson = persons.find((person) => person.name === newName);
+
+    if (existingPerson) {
+      personsService
+        .updatePerson({ ...existingPerson, number: newNumber })
+        .then(() => {
+          setPersons(
+            persons.map((person) => {
+              if (person.id === existingPerson.id) {
+                return { ...person, number: newNumber };
+              }
+              return person;
+            })
+          );
+          setErrorMessageTemp({
+            message: `Successfully updated ${newName}'s number`,
+            isPositive: true,
+          });
+          setNewName("");
+          setNewNumber("");
+        })
+        .catch((error) => {
+          setErrorMessageTemp({
+            message: `Could not update ${newName}'s number`,
+            isPositive: false,
+          });
+          console.log(`Could not update ${newName}'s number`, error);
         });
-        setNewName("");
-        setNewNumber("");
-      })
-      .catch((error) => {
-        setErrorMessageTemp({
-          message: `Could not add ${newName}`,
-          isPositive: false,
+    } else {
+      personsService
+        .createPerson({ name: newName, number: newNumber })
+        .then((response) => {
+          setPersons([...persons, response.data]);
+          setErrorMessageTemp({
+            message: `Successfully create ${newName}'s number`,
+            isPositive: true,
+          });
+          setNewName("");
+          setNewNumber("");
+        })
+        .catch((error) => {
+          setErrorMessageTemp({
+            message: `Could not add ${newName}`,
+            isPositive: false,
+          });
+          console.log(`Could not add ${newName}`, error);
         });
-        console.log(`Could not add ${newName}`, error);
-      });
+    }
   };
 
   const personDeleteOnClick = (personDelete) => {
