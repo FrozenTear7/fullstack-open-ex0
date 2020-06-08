@@ -2,11 +2,11 @@
   "name": "blog-list-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.mjs",
+  "main": "index.js",
   "scripts": {
-    "start": "node --experimental-json-modules index.mjs",
-    "dev": "nodemon --experimental-json-modules index.mjs",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node --experimental-json-modules index.js",
+    "dev": "nodemon --experimental-json-modules index.js",
+    "test": "jest --verbose"
   },
   "author": "Paweł Mendroch",
   "license": "MIT",
@@ -20,6 +20,8 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.10.2",
+    "babel-jest": "^26.0.1",
     "eslint": "^6.8.0",
     "eslint-config-airbnb": "^18.1.0",
     "eslint-config-node": "^4.1.0",
@@ -31,6 +33,7 @@
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-hooks": "^2.5.0",
     "husky": "^4.2.5",
+    "jest": "^26.0.1",
     "lint-staged": "^10.2.9",
     "nodemon": "^2.0.4",
     "prettier": "^2.0.5"

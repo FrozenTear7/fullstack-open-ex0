@@ -2,10 +2,10 @@ import express from 'express'
 import cors from 'cors'
 import mongoose from 'mongoose'
 import morgan from 'morgan'
-import config from './utils/config.mjs'
-import blogsRouter from './controllers/blogs.mjs'
-import middleware from './utils/middleware.mjs'
-import logger from './utils/logger.mjs'
+import config from './utils/config.js'
+import blogsRouter from './controllers/blogs.js'
+import middleware from './utils/middleware.js'
+import logger from './utils/logger.js'
 
 const app = express()
 
