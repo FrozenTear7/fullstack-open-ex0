@@ -19,6 +19,7 @@
     "import/first": "off",
     "quotes": ["error", "single"],
     "semi": ["error", "never"],
-    "import/extensions": "off"
+    "import/extensions": "off",
+    "import/prefer-default-export": "off"
   }
 }
