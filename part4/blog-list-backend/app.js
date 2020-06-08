@@ -1,4 +1,5 @@
 import express from 'express'
+import 'express-async-errors'
 import cors from 'cors'
 import mongoose from 'mongoose'
 import morgan from 'morgan'
@@ -19,6 +20,9 @@ app.use(
 )
 
 logger.info('connecting to', config.MONGODB_URI)
+
+mongoose.set('useFindAndModify', false)
+mongoose.set('useCreateIndex', true)
 
 mongoose
   .connect(config.MONGODB_URI, {

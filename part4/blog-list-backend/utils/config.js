@@ -1,8 +1,13 @@
+/* eslint-disable prefer-const */
 import dotenv from 'dotenv'
 
 dotenv.config({ silent: true })
 
-const { PORT, MONGODB_URI } = process.env
+let { PORT, MONGODB_URI } = process.env
+
+if (process.env.NODE_ENV === 'test') {
+  MONGODB_URI = process.env.TEST_MONGODB_URI
+}
 
 export default {
   MONGODB_URI,

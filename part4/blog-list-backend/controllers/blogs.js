@@ -3,18 +3,42 @@ import Blog from '../models/blog.js'
 
 const blogsRouter = express.Router()
 
-blogsRouter.get('/', (request, response) => {
-  Blog.find({}).then((blogs) => {
-    response.json(blogs)
-  })
+blogsRouter.get('/', async (req, res) => {
+  const blogs = await Blog.find({})
+
+  res.json(blogs)
 })
 
-blogsRouter.post('/', (request, response) => {
-  const blog = new Blog(request.body)
+blogsRouter.post('/', async (req, res) => {
+  const blog = new Blog(req.body)
+  const result = await blog.save()
 
-  blog.save().then((result) => {
-    response.status(201).json(result)
-  })
+  res.status(201).json(result)
+})
+
+blogsRouter.put('/:id', async (req, res) => {
+  const { body } = req
+
+  const result = await Blog.findByIdAndUpdate(
+    req.params.id,
+    {
+      $set: {
+        title: body.title,
+        author: body.author,
+        url: body.url,
+        likes: body.likes,
+      },
+    },
+    { runValidators: true, context: 'query', new: true }
+  )
+
+  res.status(200).json(result)
+})
+
+blogsRouter.delete('/:id', async (req, res) => {
+  await Blog.findByIdAndRemove(req.params.id)
+
+  res.status(204).end()
 })
 
 export default blogsRouter
