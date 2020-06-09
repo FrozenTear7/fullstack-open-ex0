@@ -8,14 +8,11 @@ const api = supertest(app)
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  // console.log('cleared')
 
   initialBlogs.forEach(async (blog) => {
     const noteObject = new Blog(blog)
     await noteObject.save()
-    // console.log('saved')
   })
-  // console.log('done')
 })
 
 describe('GET /api/blogs', () => {
