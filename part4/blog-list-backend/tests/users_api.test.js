@@ -6,15 +6,15 @@ import User from '../models/user.js'
 
 const api = supertest(app)
 
+beforeEach(async () => {
+  await User.deleteMany({})
+
+  const newUser = new User(initialUser)
+
+  await newUser.save()
+})
+
 describe('when there is initially one user in db', () => {
-  beforeEach(async () => {
-    await User.deleteMany({})
-
-    const newUser = new User(initialUser)
-
-    await newUser.save()
-  })
-
   test('valid users is created', async () => {
     const usersAtStart = await usersInDb()
 
@@ -99,6 +99,45 @@ describe('when there is initially one user in db', () => {
 
     const usersAtEnd = await usersInDb()
     expect(usersAtEnd).toHaveLength(usersAtStart.length)
+  })
+})
+
+describe('user signing in', () => {
+  test('valid user is signed in and gets a token', async () => {
+    const newUser = {
+      username: 'testUser',
+      name: 'Superuser',
+      password: 'password',
+    }
+
+    await api.post('/api/users').send(newUser)
+
+    const response = await api
+      .post('/api/login')
+      .send({ username: newUser.username, password: newUser.password })
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body.token).toBeTruthy()
+  })
+
+  test('invalid user gets a login error', async () => {
+    const usersAtStart = await usersInDb()
+
+    const newUser = {
+      username: 'testUser',
+      name: 'Superuser',
+      password: 'salainen',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await usersInDb()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
   })
 })
 

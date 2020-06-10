@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 
 dotenv.config({ silent: true })
 
-let { PORT, MONGODB_URI } = process.env
+let { PORT, MONGODB_URI, SECRET } = process.env
 
 if (process.env.NODE_ENV === 'test') {
   MONGODB_URI = process.env.TEST_MONGODB_URI
@@ -12,4 +12,5 @@ if (process.env.NODE_ENV === 'test') {
 export default {
   MONGODB_URI,
   PORT,
+  SECRET,
 }
