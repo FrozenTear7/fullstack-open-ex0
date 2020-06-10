@@ -5,7 +5,9 @@
     "prettier/prettier": [
       "error",
       {
-        "endOfLine": "auto"
+        "endOfLine": "auto",
+        "singleQuote": true,
+        "semi": false
       }
     ],
     "no-console": 0,
@@ -14,6 +16,11 @@
     "import/first": "off",
     "react/prop-types": "off",
     "react/jsx-one-expression-per-line": "off",
+    "quotes": ["error", "single"],
+    "semi": ["error", "never"],
+    "import/extensions": "off",
+    "import/prefer-default-export": "off",
+    "consistent-return": "off",
     "no-shadow": "off"
   },
   "globals": {
