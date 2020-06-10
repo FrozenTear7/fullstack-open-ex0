@@ -13,7 +13,11 @@ blogsRouter.get('/', async (req, res) => {
 blogsRouter.post('/', async (req, res) => {
   const { body } = req
 
-  const user = await User.findById(body.userId)
+  let user = await User.findById(body.userId)
+
+  if (!user) {
+    user = await User.findOne({})
+  }
 
   const blog = new Blog({
     title: body.title,
@@ -23,6 +27,8 @@ blogsRouter.post('/', async (req, res) => {
     user: user._id,
   })
   const savedBlog = await blog.save()
+
+  console.log(user)
 
   user.blogs = user.blogs.concat(savedBlog._id)
   user.save()

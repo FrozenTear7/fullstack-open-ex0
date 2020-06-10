@@ -1,5 +1,4 @@
 import {
-  dummy,
   totalLikes,
   favoriteBlog,
   mostBlogs,
@@ -71,11 +70,6 @@ const blogs = [
     __v: 0,
   },
 ]
-
-test('dummy returns one', () => {
-  const result = dummy([])
-  expect(result).toBe(1)
-})
 
 describe('total likes', () => {
   test('of empty list is zero', () => {

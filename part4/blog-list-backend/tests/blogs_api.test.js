@@ -1,18 +1,25 @@
 import { connection } from 'mongoose'
 import supertest from 'supertest'
 import app from '../app'
-import { initialBlogs, blogsInDb } from './test_helper.js'
-import Blog from '../models/blog'
+import { initialBlogs, initialUser, blogsInDb } from './test_helper.js'
+import Blog from '../models/blog.js'
+import User from '../models/user.js'
 
 const api = supertest(app)
 
 beforeEach(async () => {
+  await User.deleteMany({})
   await Blog.deleteMany({})
 
+  const newUser = new User(initialUser)
+
   initialBlogs.forEach(async (blog) => {
-    const noteObject = new Blog(blog)
-    await noteObject.save()
+    const newBlog = new Blog(blog)
+    newUser.blogs = newUser.blogs.concat(newBlog._id)
+    await newBlog.save()
   })
+
+  await newUser.save()
 })
 
 describe('GET /api/blogs', () => {
@@ -43,6 +50,7 @@ describe('POST /api/blogs', () => {
       author: 'Zulul Warrior',
       url: 'https://www.twitch.tv/forsen',
       likes: 5,
+      userId: initialUser._id,
     }
 
     await api
@@ -63,6 +71,7 @@ describe('POST /api/blogs', () => {
       title: 'Test testing',
       author: 'Zulul Warrior',
       url: 'https://www.twitch.tv/forsen',
+      userId: initialUser._id,
     }
 
     const response = await api.post('/api/blogs').send(newBlog)
@@ -74,6 +83,7 @@ describe('POST /api/blogs', () => {
     const newBlog = {
       author: 'Zulul Warrior',
       likes: 5,
+      userId: initialUser._id,
     }
 
     await api.post('/api/blogs').send(newBlog).expect(400)
@@ -147,6 +157,7 @@ describe('DELETE /api/blogs/:id', () => {
   })
 })
 
-afterAll(() => {
+afterAll(async (done) => {
   connection.close()
+  done()
 })
