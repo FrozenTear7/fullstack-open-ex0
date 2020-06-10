@@ -114,6 +114,18 @@ describe('POST /api/blogs', () => {
       .send(newBlog)
       .expect(400)
   })
+
+  test('missing token returns http unauthorized', async () => {
+    const newBlog = {
+      title: 'Test testing',
+      author: 'Zulul Warrior',
+      url: 'https://www.twitch.tv/forsen',
+      likes: 5,
+      userId: initialUser._id,
+    }
+
+    await api.post('/api/blogs').send(newBlog).expect(401)
+  })
 })
 
 describe('PUT /api/blogs/:id', () => {
@@ -178,6 +190,18 @@ describe('PUT /api/blogs/:id', () => {
       .send(testBlog)
       .expect(400)
   })
+
+  test('missing token returns http unauthorized', async () => {
+    const testBlog = {
+      ...initialBlogs[0],
+      title: 'Updated title',
+      author: 'Updated author',
+      url: 'Updated url.com',
+      likes: 123,
+    }
+
+    await api.put(`/api/blogs/${testBlog._id}`).send(testBlog).expect(401)
+  })
 })
 
 describe('DELETE /api/blogs/:id', () => {
@@ -205,6 +229,12 @@ describe('DELETE /api/blogs/:id', () => {
 
     const blogsAtEnd = await blogsInDb()
     expect(blogsAtEnd).toHaveLength(initialBlogs.length)
+  })
+
+  test('missing token returns http unauthorized', async () => {
+    const testBlog = initialBlogs[0]
+
+    await api.delete(`/api/blogs/${testBlog._id}`).expect(401)
   })
 })
 
