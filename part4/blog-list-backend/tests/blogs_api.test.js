@@ -45,16 +45,30 @@ describe('GET /api/blogs', () => {
 
 describe('POST /api/blogs', () => {
   test('a valid blog can be added', async () => {
+    const user = {
+      username: 'testUser',
+      name: 'Superuser',
+      password: 'password',
+    }
+
+    const newUser = await api.post('/api/users').send(user)
+
+    const userTokenResponse = await api
+      .post('/api/login')
+      .send({ username: user.username, password: user.password })
+    const { token } = userTokenResponse.body
+
     const newBlog = {
       title: 'Test testing',
       author: 'Zulul Warrior',
       url: 'https://www.twitch.tv/forsen',
       likes: 5,
-      userId: initialUser._id,
+      userId: newUser._id,
     }
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -67,33 +81,98 @@ describe('POST /api/blogs', () => {
   })
 
   test('no likes value defaults to 0', async () => {
+    const user = {
+      username: 'testUser',
+      name: 'Superuser',
+      password: 'password',
+    }
+
+    const newUser = await api.post('/api/users').send(user)
+
+    const userTokenResponse = await api
+      .post('/api/login')
+      .send({ username: user.username, password: user.password })
+    const { token } = userTokenResponse.body
+
     const newBlog = {
       title: 'Test testing',
       author: 'Zulul Warrior',
       url: 'https://www.twitch.tv/forsen',
-      userId: initialUser._id,
+      userId: newUser._id,
     }
 
-    const response = await api.post('/api/blogs').send(newBlog)
+    const response = await api
+      .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
+      .send(newBlog)
 
     expect(response.body.likes).toBe(0)
   })
 
   test('title and url missing return http 400', async () => {
+    const user = {
+      username: 'testUser',
+      name: 'Superuser',
+      password: 'password',
+    }
+
+    const newUser = await api.post('/api/users').send(user)
+
+    const userTokenResponse = await api
+      .post('/api/login')
+      .send({ username: user.username, password: user.password })
+    const { token } = userTokenResponse.body
+
     const newBlog = {
       author: 'Zulul Warrior',
       likes: 5,
-      userId: initialUser._id,
+      userId: newUser._id,
     }
 
-    await api.post('/api/blogs').send(newBlog).expect(400)
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
+      .send(newBlog)
+      .expect(400)
   })
 })
 
 describe('PUT /api/blogs/:id', () => {
   test('update works correctly', async () => {
+    const user = {
+      username: 'testUser',
+      name: 'Superuser',
+      password: 'password',
+    }
+
+    const newUser = await api.post('/api/users').send(user)
+
+    const userTokenResponse = await api
+      .post('/api/login')
+      .send({ username: user.username, password: user.password })
+    const { token } = userTokenResponse.body
+
+    const blog = {
+      title: 'Test testing',
+      author: 'Zulul Warrior',
+      url: 'https://www.twitch.tv/forsen',
+      likes: 5,
+      userId: newUser._id,
+    }
+
+    const newBlog = await api
+      .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
+      .send(blog)
+
+    // newUser.blogs = newUser.blogs.concat(newBlog._id)
+    // await newUser.save()
+
+    console.log(newUser)
+    console.log(newBlog)
+
     const testBlog = {
-      ...initialBlogs[0],
+      ...newBlog,
       title: 'Updated title',
       author: 'Updated author',
       url: 'Updated url.com',
@@ -102,6 +181,7 @@ describe('PUT /api/blogs/:id', () => {
 
     const response = await api
       .put(`/api/blogs/${testBlog._id}`)
+      .set('Authorization', `bearer ${token}`)
       .send(testBlog)
       .expect(200)
       .expect('Content-Type', /application\/json/)
@@ -115,6 +195,19 @@ describe('PUT /api/blogs/:id', () => {
   })
 
   test('invalid id returns error', async () => {
+    const user = {
+      username: 'testUser',
+      name: 'Superuser',
+      password: 'password',
+    }
+
+    await api.post('/api/users').send(user)
+
+    const userTokenResponse = await api
+      .post('/api/login')
+      .send({ username: user.username, password: user.password })
+    const { token } = userTokenResponse.body
+
     const testBlog = {
       ...initialBlogs[0],
       title: 'Updated title',
@@ -123,10 +216,27 @@ describe('PUT /api/blogs/:id', () => {
       likes: 123,
     }
 
-    await api.put('/api/blogs/someNonExistingId').send(testBlog).expect(400)
+    await api
+      .put('/api/blogs/someNonExistingId')
+      .set('Authorization', `bearer ${token}`)
+      .send(testBlog)
+      .expect(400)
   })
 
   test('check if validators work correctly', async () => {
+    const user = {
+      username: 'testUser',
+      name: 'Superuser',
+      password: 'password',
+    }
+
+    await api.post('/api/users').send(user)
+
+    const userTokenResponse = await api
+      .post('/api/login')
+      .send({ username: user.username, password: user.password })
+    const { token } = userTokenResponse.body
+
     const testBlog = {
       ...initialBlogs[0],
       title: '',
@@ -135,22 +245,58 @@ describe('PUT /api/blogs/:id', () => {
       likes: 123,
     }
 
-    await api.put(`/api/blogs/${testBlog._id}`).send(testBlog).expect(400)
+    await api
+      .put(`/api/blogs/${testBlog._id}`)
+      .set('Authorization', `bearer ${token}`)
+      .send(testBlog)
+      .expect(400)
   })
 })
 
 describe('DELETE /api/blogs/:id', () => {
   test('correct blog is deleted', async () => {
+    const user = {
+      username: 'testUser',
+      name: 'Superuser',
+      password: 'password',
+    }
+
+    await api.post('/api/users').send(user)
+
+    const userTokenResponse = await api
+      .post('/api/login')
+      .send({ username: user.username, password: user.password })
+    const { token } = userTokenResponse.body
+
     const testBlog = initialBlogs[0]
 
-    await api.delete(`/api/blogs/${testBlog._id}`).expect(204)
+    await api
+      .delete(`/api/blogs/${testBlog._id}`)
+      .set('Authorization', `bearer ${token}`)
+      .expect(204)
 
     const blogsAtEnd = await blogsInDb()
     expect(blogsAtEnd).toHaveLength(initialBlogs.length - 1)
   })
 
   test('invalid id returns error', async () => {
-    await api.delete('/api/blogs/someNonExistingId').expect(400)
+    const user = {
+      username: 'testUser',
+      name: 'Superuser',
+      password: 'password',
+    }
+
+    await api.post('/api/users').send(user)
+
+    const userTokenResponse = await api
+      .post('/api/login')
+      .send({ username: user.username, password: user.password })
+    const { token } = userTokenResponse.body
+
+    await api
+      .delete('/api/blogs/someNonExistingId')
+      .set('Authorization', `bearer ${token}`)
+      .expect(400)
 
     const blogsAtEnd = await blogsInDb()
     expect(blogsAtEnd).toHaveLength(initialBlogs.length)
