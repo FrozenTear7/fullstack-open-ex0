@@ -45,22 +45,18 @@ blogsRouter.put('/:id', async (req, res) => {
   }
 
   const user = await User.findById(decodedToken.id)
-  let blog = await Blog.findById(req.params.id)
+  const blog = await Blog.findById(req.params.id)
 
   if (!blog) {
     return res.status(400).json({ error: 'blog does not exist' })
   }
 
   if (blog.user.equals(user._id)) {
-    blog = {
-      ...blog,
-      ...{
-        title: body.title,
-        author: body.author,
-        url: body.url,
-        likes: body.likes,
-      },
-    }
+    blog.title = body.title
+    blog.author = body.author
+    blog.url = body.url
+    blog.likes = body.likes
+
     await blog.save()
     res.json(blog)
   } else {

@@ -4,7 +4,8 @@ import User from '../models/user.js'
 const initialUser = {
   _id: '5a422a851b54a676234d17a1',
   username: 'root',
-  passwordHash: '11a3a21f1fszvb131v1',
+  name: 'root guy',
+  passwordHash: 'rootPassword',
   __v: 0,
 }
 
@@ -94,4 +95,20 @@ const usersInDb = async () => {
   return users.map((u) => u.toJSON())
 }
 
-export { initialBlogs, initialUser, nonExistingId, blogsInDb, usersInDb }
+const getUserToken = async (api) => {
+  const userTokenResponse = await api.post('/api/login').send({
+    username: initialUser.username,
+    password: initialUser.passwordHash,
+  })
+
+  return userTokenResponse.body.token
+}
+
+export {
+  initialBlogs,
+  initialUser,
+  nonExistingId,
+  blogsInDb,
+  usersInDb,
+  getUserToken,
+}

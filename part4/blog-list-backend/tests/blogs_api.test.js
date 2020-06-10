@@ -1,7 +1,13 @@
 import { connection } from 'mongoose'
 import supertest from 'supertest'
+import bcrypt from 'bcryptjs'
 import app from '../app'
-import { initialBlogs, initialUser, blogsInDb } from './test_helper.js'
+import {
+  initialBlogs,
+  initialUser,
+  blogsInDb,
+  getUserToken,
+} from './test_helper.js'
 import Blog from '../models/blog.js'
 import User from '../models/user.js'
 
@@ -11,7 +17,13 @@ beforeEach(async () => {
   await User.deleteMany({})
   await Blog.deleteMany({})
 
-  const newUser = new User(initialUser)
+  const saltRounds = 10
+  const passwordHash = await bcrypt.hash(initialUser.passwordHash, saltRounds)
+
+  const newUser = new User({
+    ...initialUser,
+    passwordHash,
+  })
 
   initialBlogs.forEach(async (blog) => {
     const newBlog = new Blog(blog)
@@ -45,25 +57,14 @@ describe('GET /api/blogs', () => {
 
 describe('POST /api/blogs', () => {
   test('a valid blog can be added', async () => {
-    const user = {
-      username: 'testUser',
-      name: 'Superuser',
-      password: 'password',
-    }
-
-    const newUser = await api.post('/api/users').send(user)
-
-    const userTokenResponse = await api
-      .post('/api/login')
-      .send({ username: user.username, password: user.password })
-    const { token } = userTokenResponse.body
+    const token = await getUserToken(api)
 
     const newBlog = {
       title: 'Test testing',
       author: 'Zulul Warrior',
       url: 'https://www.twitch.tv/forsen',
       likes: 5,
-      userId: newUser._id,
+      userId: initialUser._id,
     }
 
     await api
@@ -81,24 +82,13 @@ describe('POST /api/blogs', () => {
   })
 
   test('no likes value defaults to 0', async () => {
-    const user = {
-      username: 'testUser',
-      name: 'Superuser',
-      password: 'password',
-    }
-
-    const newUser = await api.post('/api/users').send(user)
-
-    const userTokenResponse = await api
-      .post('/api/login')
-      .send({ username: user.username, password: user.password })
-    const { token } = userTokenResponse.body
+    const token = await getUserToken(api)
 
     const newBlog = {
       title: 'Test testing',
       author: 'Zulul Warrior',
       url: 'https://www.twitch.tv/forsen',
-      userId: newUser._id,
+      userId: initialUser._id,
     }
 
     const response = await api
@@ -110,23 +100,12 @@ describe('POST /api/blogs', () => {
   })
 
   test('title and url missing return http 400', async () => {
-    const user = {
-      username: 'testUser',
-      name: 'Superuser',
-      password: 'password',
-    }
-
-    const newUser = await api.post('/api/users').send(user)
-
-    const userTokenResponse = await api
-      .post('/api/login')
-      .send({ username: user.username, password: user.password })
-    const { token } = userTokenResponse.body
+    const token = await getUserToken(api)
 
     const newBlog = {
       author: 'Zulul Warrior',
       likes: 5,
-      userId: newUser._id,
+      userId: initialUser._id,
     }
 
     await api
@@ -139,40 +118,10 @@ describe('POST /api/blogs', () => {
 
 describe('PUT /api/blogs/:id', () => {
   test('update works correctly', async () => {
-    const user = {
-      username: 'testUser',
-      name: 'Superuser',
-      password: 'password',
-    }
-
-    const newUser = await api.post('/api/users').send(user)
-
-    const userTokenResponse = await api
-      .post('/api/login')
-      .send({ username: user.username, password: user.password })
-    const { token } = userTokenResponse.body
-
-    const blog = {
-      title: 'Test testing',
-      author: 'Zulul Warrior',
-      url: 'https://www.twitch.tv/forsen',
-      likes: 5,
-      userId: newUser._id,
-    }
-
-    const newBlog = await api
-      .post('/api/blogs')
-      .set('Authorization', `bearer ${token}`)
-      .send(blog)
-
-    // newUser.blogs = newUser.blogs.concat(newBlog._id)
-    // await newUser.save()
-
-    console.log(newUser)
-    console.log(newBlog)
+    const token = await getUserToken(api)
 
     const testBlog = {
-      ...newBlog,
+      ...initialBlogs[0],
       title: 'Updated title',
       author: 'Updated author',
       url: 'Updated url.com',
@@ -195,18 +144,7 @@ describe('PUT /api/blogs/:id', () => {
   })
 
   test('invalid id returns error', async () => {
-    const user = {
-      username: 'testUser',
-      name: 'Superuser',
-      password: 'password',
-    }
-
-    await api.post('/api/users').send(user)
-
-    const userTokenResponse = await api
-      .post('/api/login')
-      .send({ username: user.username, password: user.password })
-    const { token } = userTokenResponse.body
+    const token = await getUserToken(api)
 
     const testBlog = {
       ...initialBlogs[0],
@@ -224,18 +162,7 @@ describe('PUT /api/blogs/:id', () => {
   })
 
   test('check if validators work correctly', async () => {
-    const user = {
-      username: 'testUser',
-      name: 'Superuser',
-      password: 'password',
-    }
-
-    await api.post('/api/users').send(user)
-
-    const userTokenResponse = await api
-      .post('/api/login')
-      .send({ username: user.username, password: user.password })
-    const { token } = userTokenResponse.body
+    const token = await getUserToken(api)
 
     const testBlog = {
       ...initialBlogs[0],
@@ -255,18 +182,7 @@ describe('PUT /api/blogs/:id', () => {
 
 describe('DELETE /api/blogs/:id', () => {
   test('correct blog is deleted', async () => {
-    const user = {
-      username: 'testUser',
-      name: 'Superuser',
-      password: 'password',
-    }
-
-    await api.post('/api/users').send(user)
-
-    const userTokenResponse = await api
-      .post('/api/login')
-      .send({ username: user.username, password: user.password })
-    const { token } = userTokenResponse.body
+    const token = await getUserToken(api)
 
     const testBlog = initialBlogs[0]
 
@@ -280,18 +196,7 @@ describe('DELETE /api/blogs/:id', () => {
   })
 
   test('invalid id returns error', async () => {
-    const user = {
-      username: 'testUser',
-      name: 'Superuser',
-      password: 'password',
-    }
-
-    await api.post('/api/users').send(user)
-
-    const userTokenResponse = await api
-      .post('/api/login')
-      .send({ username: user.username, password: user.password })
-    const { token } = userTokenResponse.body
+    const token = await getUserToken(api)
 
     await api
       .delete('/api/blogs/someNonExistingId')
