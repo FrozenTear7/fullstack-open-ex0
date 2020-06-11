@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import LoginForm from './components/LoginForm'
@@ -9,12 +10,9 @@ import BlogForm from './components/BlogForm'
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [errorMessage, setErrorMessage] = useState(null)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
+
+  const blogFormRef = React.createRef()
 
   const setErrorMessageTemp = (message) => {
     setErrorMessage(message)
@@ -39,52 +37,42 @@ const App = () => {
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
+      const user = 'JSON.parse(loggedUserJSON)'
       setUser(user)
     }
   }, [])
 
-  const handleLogin = async (event) => {
-    event.preventDefault()
-
+  const loginUser = async (user) => {
     try {
-      const user = await loginService.login({
-        username,
-        password,
-      })
+      const loggedUser = await loginService.login(user)
 
-      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
+      window.localStorage.setItem(
+        'loggedBlogappUser',
+        JSON.stringify(loggedUser)
+      )
 
       setErrorMessageTemp({
         message: 'Successfully logged in',
         isPositive: true,
       })
-      setUser(user)
-      setUsername('')
-      setPassword('')
+
+      setUser(loggedUser)
     } catch (error) {
       setErrorMessageTemp({ message: 'Wrong credentials', isPositive: false })
     }
   }
 
-  const handleBlogSubmit = async (event) => {
-    event.preventDefault()
-
+  const createBlog = async (blog) => {
     try {
-      const blog = await blogService.create({
-        title,
-        author,
-        url,
-      })
+      const createdBlog = await blogService.create(blog)
 
       setErrorMessageTemp({
-        message: `Successfully create blog ${title}`,
+        message: `Successfully create blog: ${createdBlog.title}`,
         isPositive: true,
       })
-      setBlogs(blogs.concat(blog))
-      setTitle('')
-      setAuthor('')
-      setUrl('')
+
+      blogFormRef.current.toggleVisibility()
+      setBlogs(blogs.concat(createdBlog))
     } catch (error) {
       setErrorMessageTemp({ message: error, isPositive: false })
     }
@@ -105,15 +93,13 @@ const App = () => {
           <button type="button" onClick={handleLogout}>
             logout
           </button>
-          <BlogForm
-            title={title}
-            setTitle={setTitle}
-            author={author}
-            setAuthor={setAuthor}
-            url={url}
-            setUrl={setUrl}
-            handleBlogSubmit={handleBlogSubmit}
-          />
+          <Togglable
+            buttonLabel="new blog"
+            cancelLabel="cancel"
+            ref={blogFormRef}
+          >
+            <BlogForm createBlog={createBlog} />
+          </Togglable>
           {blogs.map((blog) => (
             <Blog key={blog.id} blog={blog} />
           ))}
@@ -121,13 +107,7 @@ const App = () => {
       ) : (
         <div>
           <h2>Log in to application</h2>
-          <LoginForm
-            username={username}
-            setUsername={setUsername}
-            password={password}
-            setPassword={setPassword}
-            handleLogin={handleLogin}
-          />
+          <LoginForm loginUser={loginUser} />
         </div>
       )}
     </div>
