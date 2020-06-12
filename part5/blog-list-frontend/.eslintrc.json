@@ -1,6 +1,18 @@
 {
+  "env": {
+    "browser": true,
+    "es6": true,
+    "jest/globals": true
+  },
   "extends": ["airbnb", "prettier"],
-  "plugins": ["prettier"],
+  "plugins": ["prettier", "jest"],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
   "rules": {
     "prettier/prettier": [
       "error",
@@ -22,7 +34,8 @@
     "import/prefer-default-export": "off",
     "consistent-return": "off",
     "no-shadow": "off",
-    "no-alert": "off"
+    "no-alert": "off",
+    "react/forbid-prop-types": "off"
   },
   "globals": {
     "window": true,
