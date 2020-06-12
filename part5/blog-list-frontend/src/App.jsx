@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
@@ -12,7 +12,7 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [user, setUser] = useState(null)
 
-  const blogFormRef = React.createRef()
+  const blogFormRef = useRef()
 
   const setErrorMessageTemp = (message) => {
     setErrorMessage(message)
@@ -24,10 +24,13 @@ const App = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const blogs = await blogService.getAll()
+        const blogs = await blogService.getAllBlogs()
         setBlogs(blogs)
       } catch (error) {
-        setErrorMessageTemp({ message: error, isPositive: false })
+        setErrorMessageTemp({
+          message: error.response.data.error,
+          isPositive: false,
+        })
       }
     }
 
@@ -58,23 +61,72 @@ const App = () => {
 
       setUser(loggedUser)
     } catch (error) {
-      setErrorMessageTemp({ message: 'Wrong credentials', isPositive: false })
+      setErrorMessageTemp({
+        message: error.response.data.error,
+        isPositive: false,
+      })
     }
   }
 
   const createBlog = async (blog) => {
     try {
-      const createdBlog = await blogService.create(blog)
+      const createdBlog = await blogService.createBlog(blog)
 
       setErrorMessageTemp({
         message: `Successfully create blog: ${createdBlog.title}`,
         isPositive: true,
       })
 
-      blogFormRef.current.toggleVisibility()
+      if (blogFormRef.current) blogFormRef.current.toggleVisibility()
       setBlogs(blogs.concat(createdBlog))
     } catch (error) {
-      setErrorMessageTemp({ message: error, isPositive: false })
+      setErrorMessageTemp({
+        message: error.response.data.error,
+        isPositive: false,
+      })
+    }
+  }
+
+  const likeBlog = async (blog) => {
+    try {
+      const updatedBlog = await blogService.updateBlog(blog)
+
+      setErrorMessageTemp({
+        message: 'Successfully liked the blog',
+        isPositive: true,
+      })
+
+      setBlogs(
+        blogs.map((blog) => {
+          if (blog.id === updatedBlog.id) {
+            return updatedBlog
+          }
+          return blog
+        })
+      )
+    } catch (error) {
+      setErrorMessageTemp({
+        message: error.response.data.error,
+        isPositive: false,
+      })
+    }
+  }
+
+  const deleteBlog = async (blogId) => {
+    try {
+      await blogService.deleteBlog(blogId)
+
+      setErrorMessageTemp({
+        message: 'Successfully deleted the blog',
+        isPositive: true,
+      })
+
+      setBlogs(blogs.filter((blog) => blog.id !== blogId))
+    } catch (error) {
+      setErrorMessageTemp({
+        message: error.response.data.error,
+        isPositive: false,
+      })
     }
   }
 
@@ -100,9 +152,16 @@ const App = () => {
           >
             <BlogForm createBlog={createBlog} />
           </Togglable>
-          {blogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} />
-          ))}
+          {blogs
+            .sort((a, b) => b.likes - a.likes)
+            .map((blog) => (
+              <Blog
+                key={blog.id}
+                blog={blog}
+                likeBlog={likeBlog}
+                deleteBlog={deleteBlog}
+              />
+            ))}
         </div>
       ) : (
         <div>
