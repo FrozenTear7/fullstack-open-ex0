@@ -28,7 +28,11 @@ blogsRouter.post('/', async (req, res) => {
     likes: body.likes,
     user: user._id,
   })
-  const savedBlog = await blog.save()
+
+  let savedBlog = await blog.save()
+  savedBlog = await savedBlog
+    .populate('user', { username: 1, name: 1 })
+    .execPopulate()
 
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
@@ -45,7 +49,10 @@ blogsRouter.put('/:id', async (req, res) => {
   }
 
   const user = await User.findById(decodedToken.id)
-  const blog = await Blog.findById(req.params.id)
+  const blog = await Blog.findById(req.params.id).populate('user', {
+    username: 1,
+    name: 1,
+  })
 
   if (!blog) {
     return res.status(400).json({ error: 'blog does not exist' })
