@@ -22,7 +22,10 @@ Notification.defaultProps = {
   errorMessage: {},
 }
 Notification.propTypes = {
-  errorMessage: PropTypes.object,
+  errorMessage: PropTypes.shape({
+    message: PropTypes.string,
+    isPositive: PropTypes.bool,
+  }),
 }
 
 export default Notification

@@ -73,7 +73,7 @@ const App = () => {
       const createdBlog = await blogService.createBlog(blog)
 
       setErrorMessageTemp({
-        message: `Successfully create blog: ${createdBlog.title}`,
+        message: `Successfully created blog: ${createdBlog.title}`,
         isPositive: true,
       })
 

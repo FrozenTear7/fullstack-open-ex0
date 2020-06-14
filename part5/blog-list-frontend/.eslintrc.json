@@ -2,10 +2,11 @@
   "env": {
     "browser": true,
     "es6": true,
-    "jest/globals": true
+    "jest/globals": true,
+    "cypress/globals": true
   },
   "extends": ["airbnb", "prettier"],
-  "plugins": ["prettier", "jest"],
+  "plugins": ["prettier", "jest", "cypress"],
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true
@@ -35,7 +36,7 @@
     "consistent-return": "off",
     "no-shadow": "off",
     "no-alert": "off",
-    "react/forbid-prop-types": "off"
+    "func-names": "off"
   },
   "globals": {
     "window": true,

@@ -24,7 +24,7 @@ const Blog = ({ blog, likeBlog, deleteBlog }) => {
   }
 
   return (
-    <div style={blogStyle}>
+    <div className="blog" style={blogStyle}>
       <div className="blog-title">{blog.title}</div>
       <div className="blog-author">{blog.author}</div>
       <Togglable buttonLabel="show" cancelLabel="hide">
@@ -32,12 +32,12 @@ const Blog = ({ blog, likeBlog, deleteBlog }) => {
           {blog.url} <br />
           <div className="blog-likes">
             likes: {blog.likes}{' '}
-            <button type="button" onClick={handleBlogLike}>
+            <button id="button-like" type="button" onClick={handleBlogLike}>
               like
             </button>
           </div>
           {blog.user.id === userId && (
-            <button type="button" onClick={handleBlogDelete}>
+            <button id="button-delete" type="button" onClick={handleBlogDelete}>
               delete
             </button>
           )}
@@ -49,7 +49,17 @@ const Blog = ({ blog, likeBlog, deleteBlog }) => {
 
 Blog.displayName = 'Blog'
 Blog.propTypes = {
-  blog: PropTypes.object.isRequired,
+  blog: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    author: PropTypes.string,
+    url: PropTypes.string.isRequired,
+    likes: PropTypes.number.isRequired,
+    user: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      username: PropTypes.string.isRequired,
+    }),
+  }).isRequired,
   likeBlog: PropTypes.func.isRequired,
   deleteBlog: PropTypes.func.isRequired,
 }
