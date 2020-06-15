@@ -1,15 +1,17 @@
 import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
 import { setAnecdoteFilter } from '../reducers/filterReducer'
 
-const AnecdoteFilter = () => {
-  const [filter, setFilter] = useState(useSelector((state) => state.filter))
+const AnecdoteFilter = (props) => {
+  // const [filter, setFilter] = useState(useSelector((state) => state.filter))
+  const [filter, setFilter] = useState(props.filter)
 
-  const dispatch = useDispatch()
+  // const dispatch = useDispatch()
 
   const handleOnChangeFilter = ({ target }) => {
     const newFilter = target.value
-    dispatch(setAnecdoteFilter(newFilter))
+    // dispatch(setAnecdoteFilter(newFilter))
+    props.setAnecdoteFilter(newFilter)
     setFilter(newFilter)
   }
 
@@ -24,4 +26,19 @@ const AnecdoteFilter = () => {
   )
 }
 
-export default AnecdoteFilter
+const mapStateToProps = ({ filter }) => {
+  return {
+    filter,
+  }
+}
+
+const mapDispatchToProps = () => {
+  return { setAnecdoteFilter }
+}
+
+const ConnectedAnecdoteFilter = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AnecdoteFilter)
+
+export default ConnectedAnecdoteFilter

@@ -36,7 +36,8 @@
     "no-shadow": "off",
     "no-alert": "off",
     "func-names": "off",
-    "import/no-extraneous-dependencies": "off"
+    "import/no-extraneous-dependencies": "off",
+    "react/destructuring-assignment": "off"
   },
   "globals": {
     "window": true,
