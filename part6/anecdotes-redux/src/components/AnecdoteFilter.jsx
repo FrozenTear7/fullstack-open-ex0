@@ -7,15 +7,19 @@ const AnecdoteFilter = () => {
 
   const dispatch = useDispatch()
 
-  const changeFilter = ({ target }) => {
+  const handleOnChangeFilter = ({ target }) => {
     const newFilter = target.value
     dispatch(setAnecdoteFilter(newFilter))
     setFilter(newFilter)
   }
 
+  const style = {
+    marginBottom: 10,
+  }
+
   return (
-    <div>
-      filter: <input onChange={changeFilter} value={filter} />
+    <div style={style}>
+      filter: <input onChange={handleOnChangeFilter} value={filter} />
     </div>
   )
 }

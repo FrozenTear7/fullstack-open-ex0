@@ -11,7 +11,7 @@ const AnecdoteForm = () => {
 
   const dispatch = useDispatch()
 
-  const handleAnecdoteOnSubmit = (event) => {
+  const handleOnSubmitAnecdote = (event) => {
     event.preventDefault()
 
     if (content) {
@@ -29,7 +29,7 @@ const AnecdoteForm = () => {
   return (
     <div>
       <h2>create new</h2>
-      <form onSubmit={handleAnecdoteOnSubmit}>
+      <form onSubmit={handleOnSubmitAnecdote}>
         <div>
           <input
             onChange={({ target }) => setContent(target.value)}
