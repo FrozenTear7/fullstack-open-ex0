@@ -4,9 +4,9 @@ import Anecdote from './Anecdote'
 
 const AnecdoteList = () => {
   const anecdotes = useSelector((state) =>
-    state.anecdotes.filter((anecdote) =>
-      anecdote.content.toLowerCase().includes(state.filter.toLowerCase())
-    )
+    state.anecdotes.filter((anecdote) => {
+      return anecdote.content.toLowerCase().includes(state.filter.toLowerCase())
+    })
   )
 
   return (

@@ -6,7 +6,7 @@ const reducer = (state = initialState, action) => {
 
   switch (action.type) {
     case 'SET_FILTER':
-      return action.data.filter
+      return action.data
     default:
       return state
   }
@@ -15,9 +15,7 @@ const reducer = (state = initialState, action) => {
 export const setAnecdoteFilter = (filter) => {
   return {
     type: 'SET_FILTER',
-    data: {
-      filter,
-    },
+    data: filter,
   }
 }
 
