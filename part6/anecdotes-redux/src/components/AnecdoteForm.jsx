@@ -9,7 +9,6 @@ const AnecdoteForm = () => {
 
   const handleOnSubmit = (event) => {
     event.preventDefault()
-    console.log(content)
     dispatch(createAnecdote(content))
 
     setContent('')
