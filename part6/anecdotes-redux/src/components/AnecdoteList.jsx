@@ -1,8 +1,14 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+import { useSelector } from 'react-redux'
 import Anecdote from './Anecdote'
 
-const AnecdoteList = ({ anecdotes }) => {
+const AnecdoteList = () => {
+  const anecdotes = useSelector((state) =>
+    state.anecdotes.filter((anecdote) =>
+      anecdote.content.toLowerCase().includes(state.filter.toLowerCase())
+    )
+  )
+
   return (
     <div>
       {anecdotes
@@ -12,11 +18,6 @@ const AnecdoteList = ({ anecdotes }) => {
         ))}
     </div>
   )
-}
-
-AnecdoteList.displayName = 'AnecdoteList'
-AnecdoteList.propTypes = {
-  anecdotes: PropTypes.arrayOf(PropTypes.object).isRequired,
 }
 
 export default AnecdoteList
