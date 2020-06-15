@@ -2,10 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Anecdote from './Anecdote'
 
-const Anecdotes = ({ anecdotes }) => {
+const AnecdoteList = ({ anecdotes }) => {
   return (
     <div>
-      <h2>Anecdotes</h2>
       {anecdotes
         .sort((a, b) => b.votes - a.votes)
         .map((anecdote) => (
@@ -15,9 +14,9 @@ const Anecdotes = ({ anecdotes }) => {
   )
 }
 
-Anecdotes.displayName = 'Anecdotes'
-Anecdotes.propTypes = {
+AnecdoteList.displayName = 'AnecdoteList'
+AnecdoteList.propTypes = {
   anecdotes: PropTypes.arrayOf(PropTypes.object).isRequired,
 }
 
-export default Anecdotes
+export default AnecdoteList

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import Anecdotes from './components/Anecdotes'
+import AnecdoteList from './components/AnecdoteList'
 import AnecdoteForm from './components/AnecdoteForm'
 
 const App = () => {
@@ -8,8 +8,9 @@ const App = () => {
 
   return (
     <div>
-      <Anecdotes anecdotes={anecdotes} />
+      <h2>Anecdotes</h2>
       <AnecdoteForm />
+      <AnecdoteList anecdotes={anecdotes} />
     </div>
   )
 }
