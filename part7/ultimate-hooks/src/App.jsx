@@ -24,7 +24,7 @@ const App = () => {
       <h2>notes</h2>
       <form onSubmit={handleNoteSubmit}>
         <input {...content} />
-        <button type="button">create</button>
+        <button type="submit">create</button>
       </form>
       {notes.map((n) => (
         <p key={n.id}>{n.content}</p>
@@ -34,7 +34,7 @@ const App = () => {
       <form onSubmit={handlePersonSubmit}>
         name <input {...name} /> <br />
         number <input {...number} />
-        <button type="button">create</button>
+        <button type="submit">create</button>
       </form>
       {persons.map((n) => (
         <p key={n.id}>
