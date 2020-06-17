@@ -9,7 +9,7 @@ const reducer = (state = initialState, action) => {
     case SET_USER:
       return action.data
     case REMOVE_USER:
-      return {}
+      return null
     default:
       return state
   }
