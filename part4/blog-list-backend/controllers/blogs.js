@@ -41,14 +41,8 @@ blogsRouter.post('/', async (req, res) => {
 })
 
 blogsRouter.put('/:id', async (req, res) => {
-  const { body, token } = req
+  const { body } = req
 
-  const decodedToken = jwt.verify(token, config.SECRET)
-  if (!token || !decodedToken.id) {
-    return res.status(401).json({ error: 'token missing or invalid' })
-  }
-
-  const user = await User.findById(decodedToken.id)
   const blog = await Blog.findById(req.params.id).populate('user', {
     username: 1,
     name: 1,
@@ -58,19 +52,10 @@ blogsRouter.put('/:id', async (req, res) => {
     return res.status(400).json({ error: 'blog does not exist' })
   }
 
-  if (blog.user.equals(user._id)) {
-    blog.title = body.title
-    blog.author = body.author
-    blog.url = body.url
-    blog.likes = body.likes
+  blog.likes = body.likes
 
-    await blog.save()
-    res.json(blog)
-  } else {
-    return res
-      .status(401)
-      .json({ error: 'you must be the author of the blog to remove it' })
-  }
+  await blog.save()
+  res.json(blog)
 })
 
 blogsRouter.delete('/:id', async (req, res) => {

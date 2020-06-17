@@ -1,31 +1,49 @@
 import React, { useState } from 'react'
-import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
+import { createBlog } from '../actions/blogActions'
+import { setNotification } from '../actions/notificationActions'
 
-const BlogForm = ({ createBlog }) => {
+const BlogForm = () => {
+  const dispatch = useDispatch()
+
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
 
-  const addBlog = (event) => {
+  const handleCreateBlog = (event) => {
     event.preventDefault()
 
-    const blog = {
-      title,
-      author,
-      url,
+    try {
+      const blog = {
+        title,
+        author,
+        url,
+      }
+
+      dispatch(createBlog(blog))
+
+      setTitle('')
+      setAuthor('')
+      setUrl('')
+
+      setNotification({
+        message: `Successfully created blog: ${blog.title}`,
+        isPositive: true,
+      })
+
+      // if (blogFormRef.current) blogFormRef.current.toggleVisibility()
+    } catch (error) {
+      setNotification({
+        message: error.response.data.error,
+        isPositive: false,
+      })
     }
-
-    createBlog(blog)
-
-    setTitle('')
-    setAuthor('')
-    setUrl('')
   }
 
   return (
     <div>
       <h2>create new</h2>
-      <form id="blog-form" onSubmit={addBlog}>
+      <form id="blog-form" onSubmit={handleCreateBlog}>
         <div>
           title:{' '}
           <input
@@ -62,11 +80,6 @@ const BlogForm = ({ createBlog }) => {
       </form>
     </div>
   )
-}
-
-BlogForm.displayName = 'BlogForm'
-BlogForm.propTypes = {
-  createBlog: PropTypes.func.isRequired,
 }
 
 export default BlogForm

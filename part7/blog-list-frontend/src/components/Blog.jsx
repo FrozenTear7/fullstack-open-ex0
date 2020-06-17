@@ -1,10 +1,14 @@
 import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import Togglable from './Togglable'
+import { updateBlog, deleteBlog } from '../actions/blogActions'
+import { setNotification } from '../actions/notificationActions'
 
-const Blog = ({ blog, likeBlog, deleteBlog }) => {
-  const userId =
-    JSON.parse(window.localStorage.getItem('loggedBlogappUser')).id || ''
+const Blog = ({ blog }) => {
+  const dispatch = useDispatch()
+
+  const { id: userId } = useSelector((state) => state.user)
 
   const blogStyle = {
     paddingTop: 10,
@@ -14,13 +18,38 @@ const Blog = ({ blog, likeBlog, deleteBlog }) => {
     marginBottom: 5,
   }
 
-  const handleBlogLike = () => {
-    likeBlog({ ...blog, likes: blog.likes + 1 })
+  const handleLikeBlog = () => {
+    try {
+      dispatch(updateBlog({ ...blog, likes: blog.likes + 1 }))
+
+      setNotification({
+        message: 'Successfully liked the blog',
+        isPositive: true,
+      })
+    } catch (error) {
+      setNotification({
+        message: error.response.data.error,
+        isPositive: false,
+      })
+    }
   }
 
-  const handleBlogDelete = () => {
-    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`))
-      deleteBlog(blog.id)
+  const handleDeleteBlog = () => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      try {
+        dispatch(deleteBlog(blog.id))
+
+        setNotification({
+          message: 'Successfully deleted the blog',
+          isPositive: true,
+        })
+      } catch (error) {
+        setNotification({
+          message: error.response.data.error,
+          isPositive: false,
+        })
+      }
+    }
   }
 
   return (
@@ -32,12 +61,12 @@ const Blog = ({ blog, likeBlog, deleteBlog }) => {
           {blog.url} <br />
           <div className="blog-likes">
             likes: {blog.likes}{' '}
-            <button id="button-like" type="button" onClick={handleBlogLike}>
+            <button id="button-like" type="button" onClick={handleLikeBlog}>
               like
             </button>
           </div>
           {blog.user.id === userId && (
-            <button id="button-delete" type="button" onClick={handleBlogDelete}>
+            <button id="button-delete" type="button" onClick={handleDeleteBlog}>
               delete
             </button>
           )}
@@ -60,8 +89,6 @@ Blog.propTypes = {
       username: PropTypes.string.isRequired,
     }),
   }).isRequired,
-  likeBlog: PropTypes.func.isRequired,
-  deleteBlog: PropTypes.func.isRequired,
 }
 
 export default Blog

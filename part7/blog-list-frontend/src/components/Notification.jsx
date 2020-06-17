@@ -1,7 +1,9 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+import { useSelector } from 'react-redux'
 
-const Notification = ({ errorMessage }) => {
+const Notification = () => {
+  const errorMessage = useSelector((state) => state.notification)
+
   if (!errorMessage || !errorMessage.message) {
     return null
   }
@@ -15,17 +17,6 @@ const Notification = ({ errorMessage }) => {
       {errorMessage.message}
     </div>
   )
-}
-
-Notification.displayName = 'Notification'
-Notification.defaultProps = {
-  errorMessage: {},
-}
-Notification.propTypes = {
-  errorMessage: PropTypes.shape({
-    message: PropTypes.string,
-    isPositive: PropTypes.bool,
-  }),
 }
 
 export default Notification
