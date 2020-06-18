@@ -3,6 +3,7 @@ import {
   INIT_BLOGS,
   UPDATE_BLOG,
   DELETE_BLOG,
+  POST_COMMENT,
 } from '../types/blogTypes'
 import blogService from '../services/blogs'
 import { setNotification } from './notificationActions'
@@ -108,6 +109,35 @@ export const deleteBlog = (id) => {
           isPositive: false,
         })
       )
+    }
+  }
+}
+
+export const postComment = (id, comment) => {
+  return async (dispatch) => {
+    try {
+      const updatedBlog = await blogService.createComment(id, comment)
+
+      dispatch({
+        type: POST_COMMENT,
+        data: updatedBlog,
+      })
+
+      dispatch(
+        setNotification({
+          message: `Successfully posted comment ${comment.content}`,
+          isPositive: true,
+        })
+      )
+    } catch (error) {
+      dispatch(
+        setNotification({
+          message: error.response.data.error,
+          isPositive: false,
+        })
+      )
+
+      throw error
     }
   }
 }

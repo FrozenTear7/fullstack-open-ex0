@@ -3,6 +3,7 @@ import {
   INIT_BLOGS,
   UPDATE_BLOG,
   DELETE_BLOG,
+  POST_COMMENT,
 } from '../types/blogTypes'
 
 const initialState = []
@@ -11,7 +12,7 @@ const reducer = (state = initialState, action) => {
   switch (action.type) {
     case CREATE_BLOG:
       return [...state, action.data]
-    case UPDATE_BLOG:
+    case UPDATE_BLOG && POST_COMMENT:
       return state.map((blog) => {
         if (blog.id === action.data.id) return action.data
         return blog

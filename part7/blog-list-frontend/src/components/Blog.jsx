@@ -1,8 +1,9 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useRouteMatch, useHistory, Link } from 'react-router-dom'
-import { Button } from 'react-bootstrap'
-import { updateBlog, deleteBlog } from '../actions/blogActions'
+import { Button, Form, ListGroup } from 'react-bootstrap'
+import { updateBlog, deleteBlog, postComment } from '../actions/blogActions'
+import { useField } from '../hooks'
 
 const Blog = () => {
   const dispatch = useDispatch()
@@ -17,6 +18,8 @@ const Blog = () => {
     state.blogs.find((blog) => blog.id === matchId)
   )
 
+  const { clear: clearContent, ...content } = useField('text')
+
   const handleLikeBlog = () => {
     dispatch(updateBlog({ ...blog, likes: blog.likes + 1 }))
   }
@@ -30,6 +33,17 @@ const Blog = () => {
         // eslint-disable-next-line no-empty
       } catch (error) {}
     }
+  }
+
+  const handlePostComment = (event) => {
+    event.preventDefault()
+
+    try {
+      dispatch(postComment(blog.id, { content: content.value }))
+
+      clearContent()
+      // eslint-disable-next-line no-empty
+    } catch (error) {}
   }
 
   if (!blog) {
@@ -73,6 +87,23 @@ const Blog = () => {
           </div>
         )}
       </div>
+      <hr />
+      <h4>comments</h4>
+      <Form onSubmit={handlePostComment}>
+        <Form.Group controlId="formComment">
+          <Form.Label>Comment</Form.Label>
+          <Form.Control placeholder="Comment" {...content} />
+        </Form.Group>
+        <Button variant="primary" type="submit">
+          Post
+        </Button>
+      </Form>
+      <hr />
+      <ListGroup>
+        {blog.comments.map((comment) => (
+          <ListGroup.Item key={comment.id}>{comment.content}</ListGroup.Item>
+        ))}
+      </ListGroup>
     </div>
   )
 }
