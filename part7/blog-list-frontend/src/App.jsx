@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Switch, Route, useRouteMatch } from 'react-router-dom'
+import { Switch, Route } from 'react-router-dom'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
@@ -10,6 +10,7 @@ import { initBlogs } from './actions/blogActions'
 import { logoutUser } from './actions/loginActions'
 import UserList from './components/UserList'
 import User from './components/User'
+import { initUsers } from './actions/userActions'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -20,15 +21,13 @@ const App = () => {
     dispatch(initBlogs())
   }, [dispatch])
 
+  useEffect(() => {
+    dispatch(initUsers())
+  }, [dispatch])
+
   const handleLogout = () => {
     dispatch(logoutUser())
   }
-
-  const matchUser = useRouteMatch('/users/:id')
-  const matchId = (matchUser && matchUser.params.id) || null
-  const matchedUser = useSelector((state) =>
-    state.users.find((anecdote) => anecdote.id === matchId)
-  )
 
   return (
     <div>
@@ -48,11 +47,11 @@ const App = () => {
             <Route path="/create">
               <BlogForm />
             </Route>
-            <Route path="/users">
+            <Route exact path="/users">
               <UserList />
             </Route>
-            <Route path="/users/:id">
-              <User user={matchedUser} />
+            <Route exact path="/users/:id">
+              <User />
             </Route>
           </Switch>
         </div>

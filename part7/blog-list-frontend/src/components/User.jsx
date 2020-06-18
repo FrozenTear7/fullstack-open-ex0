@@ -1,7 +1,15 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+import { useSelector } from 'react-redux'
+import { useRouteMatch } from 'react-router-dom'
 
-const User = ({ user }) => {
+const User = () => {
+  const matchUser = useRouteMatch('/users/:id')
+  const matchId = (matchUser && matchUser.params.id) || null
+
+  const user = useSelector((state) =>
+    state.users.find((user) => user.id === matchId)
+  )
+
   if (!user) {
     return <div>User does not exist!</div>
   }
@@ -9,29 +17,14 @@ const User = ({ user }) => {
   return (
     <div>
       <h3>{user.name}</h3>
+      <h5>added blogs</h5>
       <ul>
         {user.blogs.map((blog) => (
-          <li>{blog.id}</li>
+          <li>{blog.title}</li>
         ))}
       </ul>
     </div>
   )
-}
-
-User.displayName = 'User'
-User.defaultProps = null
-User.propTypes = {
-  user: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    author: PropTypes.string,
-    url: PropTypes.string.isRequired,
-    likes: PropTypes.number.isRequired,
-    user: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      username: PropTypes.string.isRequired,
-    }),
-  }),
 }
 
 export default User
