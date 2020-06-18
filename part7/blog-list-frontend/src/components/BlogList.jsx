@@ -1,17 +1,24 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import Blog from './Blog'
+import { Link } from 'react-router-dom'
+import { ListGroup } from 'react-bootstrap'
 
 const BlogList = () => {
   const blogs = useSelector((state) => state.blogs)
 
   return (
     <div>
-      {blogs
-        .sort((a, b) => b.likes - a.likes)
-        .map((blog) => (
-          <Blog key={blog.id} blog={blog} />
-        ))}
+      <h2>Blog list</h2>
+      <hr />
+      <ListGroup>
+        {blogs
+          .sort((a, b) => b.likes - a.likes)
+          .map((blog) => (
+            <ListGroup.Item key={blog.id}>
+              <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+            </ListGroup.Item>
+          ))}
+      </ListGroup>
     </div>
   )
 }

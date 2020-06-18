@@ -1,69 +1,80 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import PropTypes from 'prop-types'
-import Togglable from './Togglable'
+import { useRouteMatch, useHistory, Link } from 'react-router-dom'
+import { Button } from 'react-bootstrap'
 import { updateBlog, deleteBlog } from '../actions/blogActions'
 
-const Blog = ({ blog }) => {
+const Blog = () => {
   const dispatch = useDispatch()
+  const history = useHistory()
 
   const { id: userId } = useSelector((state) => state.login)
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-  }
+  const matchBlog = useRouteMatch('/blogs/:id')
+  const matchId = (matchBlog && matchBlog.params.id) || null
+
+  const blog = useSelector((state) =>
+    state.blogs.find((blog) => blog.id === matchId)
+  )
 
   const handleLikeBlog = () => {
     dispatch(updateBlog({ ...blog, likes: blog.likes + 1 }))
   }
 
-  const handleDeleteBlog = () => {
+  const handleDeleteBlog = async () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      dispatch(deleteBlog(blog.id))
+      try {
+        await dispatch(deleteBlog(blog.id))
+
+        history.push('/blogs')
+        // eslint-disable-next-line no-empty
+      } catch (error) {}
     }
   }
 
+  if (!blog) {
+    return <div>Blog does not exist!</div>
+  }
+
   return (
-    <div className="blog" style={blogStyle}>
-      <div className="blog-title">{blog.title}</div>
-      <div className="blog-author">{blog.author}</div>
-      <Togglable buttonLabel="show" cancelLabel="hide">
-        <div className="blog-more-content">
-          {blog.url} <br />
-          <div className="blog-likes">
-            likes: {blog.likes}{' '}
-            <button id="button-like" type="button" onClick={handleLikeBlog}>
-              like
-            </button>
-          </div>
-          {blog.user.id === userId && (
-            <button id="button-delete" type="button" onClick={handleDeleteBlog}>
-              delete
-            </button>
-          )}
+    <div>
+      <h2>
+        {blog.title} by {blog.author}
+      </h2>
+      <hr />
+      <div>
+        <a href={blog.url}>{blog.url}</a> <br />
+        <div>
+          likes: {blog.likes}{' '}
+          <Button
+            variant="secondary"
+            size="sm"
+            type="button"
+            onClick={handleLikeBlog}
+          >
+            like
+          </Button>
         </div>
-      </Togglable>
+        <small>
+          added by{' '}
+          <Link to={`/users/${blog.user.id}`}>{blog.user.username}</Link>
+        </small>
+        {blog.user.id === userId && (
+          <div>
+            <br />
+            <Button
+              variant="danger"
+              size="sm"
+              type="button"
+              onClick={handleDeleteBlog}
+            >
+              delete
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   )
-}
-
-Blog.displayName = 'Blog'
-Blog.propTypes = {
-  blog: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    author: PropTypes.string,
-    url: PropTypes.string.isRequired,
-    likes: PropTypes.number.isRequired,
-    user: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      username: PropTypes.string.isRequired,
-    }),
-  }).isRequired,
 }
 
 export default Blog

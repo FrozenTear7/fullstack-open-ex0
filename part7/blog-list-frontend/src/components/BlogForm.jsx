@@ -1,6 +1,7 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
+import { Form, Button } from 'react-bootstrap'
 import { createBlog } from '../actions/blogActions'
 import { useField } from '../hooks'
 
@@ -22,34 +23,38 @@ const BlogForm = () => {
     }
 
     try {
-      await dispatch(createBlog(blog))
+      const newBlog = await dispatch(createBlog(blog))
 
       clearTitle()
       clearAuthor()
       clearUrl()
 
-      history.push('/blogs')
+      history.push(`/blogs/${newBlog.id}`)
       // eslint-disable-next-line no-empty
     } catch (error) {}
   }
 
   return (
     <div>
-      <h2>create new</h2>
-      <form id="blog-form" onSubmit={handleCreateBlog}>
-        <div>
-          title: <input {...title} />
-        </div>
-        <div>
-          author: <input {...author} />
-        </div>
-        <div>
-          url: <input {...url} />
-        </div>
-        <button id="button-create-blog" type="submit">
-          create blog
-        </button>
-      </form>
+      <h2>Create a new blog</h2>
+      <hr />
+      <Form onSubmit={handleCreateBlog}>
+        <Form.Group controlId="formTitle">
+          <Form.Label>Title</Form.Label>
+          <Form.Control placeholder="Blog title" {...title} />
+        </Form.Group>
+        <Form.Group controlId="formTitle">
+          <Form.Label>Author</Form.Label>
+          <Form.Control placeholder="Blog's" {...author} />
+        </Form.Group>
+        <Form.Group controlId="formUrl">
+          <Form.Label>Url</Form.Label>
+          <Form.Control placeholder="Blog title" {...url} />
+        </Form.Group>
+        <Button variant="primary" type="submit">
+          Create blog
+        </Button>
+      </Form>
     </div>
   )
 }

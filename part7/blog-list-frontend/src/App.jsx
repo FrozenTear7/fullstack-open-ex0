@@ -7,10 +7,10 @@ import BlogForm from './components/BlogForm'
 import BlogList from './components/BlogList'
 import Menu from './components/Menu'
 import { initBlogs } from './actions/blogActions'
-import { logoutUser } from './actions/loginActions'
 import UserList from './components/UserList'
 import User from './components/User'
 import { initUsers } from './actions/userActions'
+import Blog from './components/Blog'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -25,41 +25,34 @@ const App = () => {
     dispatch(initUsers())
   }, [dispatch])
 
-  const handleLogout = () => {
-    dispatch(logoutUser())
-  }
-
   return (
     <div>
-      <Notification />
       {user ? (
         <div>
-          <h2>blogs</h2>
-          {user.name} logged in
-          <button type="button" onClick={handleLogout}>
-            logout
-          </button>
           <Menu />
-          <Switch>
-            <Route exact path={['/', '/blogs']}>
-              <BlogList />
-            </Route>
-            <Route path="/create">
-              <BlogForm />
-            </Route>
-            <Route exact path="/users">
-              <UserList />
-            </Route>
-            <Route exact path="/users/:id">
-              <User />
-            </Route>
-          </Switch>
+          <div className="container">
+            <Notification />
+            <Switch>
+              <Route exact path={['/', '/blogs']}>
+                <BlogList />
+              </Route>
+              <Route exact path="/blogs/:id">
+                <Blog />
+              </Route>
+              <Route path="/create">
+                <BlogForm />
+              </Route>
+              <Route exact path="/users">
+                <UserList />
+              </Route>
+              <Route exact path="/users/:id">
+                <User />
+              </Route>
+            </Switch>
+          </div>
         </div>
       ) : (
-        <div>
-          <h2>Log in to application</h2>
-          <LoginForm />
-        </div>
+        <LoginForm />
       )}
     </div>
   )

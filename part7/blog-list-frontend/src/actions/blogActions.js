@@ -23,6 +23,8 @@ export const createBlog = (blog) => {
           isPositive: true,
         })
       )
+
+      return newBlog
     } catch (error) {
       dispatch(
         setNotification({
