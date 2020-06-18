@@ -2,12 +2,15 @@ import express from 'express'
 import jwt from 'jsonwebtoken'
 import Blog from '../models/blog.js'
 import User from '../models/user.js'
+import Comment from '../models/comment.js'
 import config from '../utils/config.js'
 
 const blogsRouter = express.Router()
 
 blogsRouter.get('/', async (req, res) => {
-  const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
+  const blogs = await Blog.find({})
+    .populate('user', { username: 1, name: 1 })
+    .populate('comments', { content: 1 })
 
   res.json(blogs)
 })
@@ -32,6 +35,7 @@ blogsRouter.post('/', async (req, res) => {
   let savedBlog = await blog.save()
   savedBlog = await savedBlog
     .populate('user', { username: 1, name: 1 })
+    .populate('comments', { content: 1 })
     .execPopulate()
 
   user.blogs = user.blogs.concat(savedBlog._id)
@@ -41,36 +45,23 @@ blogsRouter.post('/', async (req, res) => {
 })
 
 blogsRouter.put('/:id', async (req, res) => {
-  const { body, token } = req
+  const { body } = req
 
-  const decodedToken = jwt.verify(token, config.SECRET)
-  if (!token || !decodedToken.id) {
-    return res.status(401).json({ error: 'token missing or invalid' })
-  }
-
-  const user = await User.findById(decodedToken.id)
-  const blog = await Blog.findById(req.params.id).populate('user', {
-    username: 1,
-    name: 1,
-  })
+  const blog = await Blog.findById(req.params.id)
+    .populate('user', {
+      username: 1,
+      name: 1,
+    })
+    .populate('comments', { content: 1 })
 
   if (!blog) {
     return res.status(400).json({ error: 'blog does not exist' })
   }
 
-  if (blog.user.equals(user._id)) {
-    blog.title = body.title
-    blog.author = body.author
-    blog.url = body.url
-    blog.likes = body.likes
+  blog.likes = body.likes
 
-    await blog.save()
-    res.json(blog)
-  } else {
-    return res
-      .status(401)
-      .json({ error: 'you must be the author of the blog to remove it' })
-  }
+  await blog.save()
+  res.json(blog)
 })
 
 blogsRouter.delete('/:id', async (req, res) => {
@@ -96,6 +87,30 @@ blogsRouter.delete('/:id', async (req, res) => {
       .status(401)
       .json({ error: 'you must be the author of the blog to remove it' })
   }
+})
+
+blogsRouter.post('/:id/comments', async (req, res) => {
+  const { body } = req
+
+  let blog = await Blog.findById(req.params.id)
+
+  const comment = new Comment({
+    content: body.content,
+    blog: req.params.id,
+  })
+
+  const savedComment = await comment.save()
+
+  blog.comments = blog.comments.concat(savedComment._id)
+
+  blog = await blog
+    .populate('user', { username: 1, name: 1 })
+    .populate('comments', { content: 1 })
+    .execPopulate()
+
+  await blog.save()
+
+  res.status(201).json(blog)
 })
 
 export default blogsRouter
