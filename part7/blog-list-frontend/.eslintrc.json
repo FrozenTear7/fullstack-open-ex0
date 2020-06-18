@@ -34,7 +34,8 @@
     "consistent-return": "off",
     "no-shadow": "off",
     "no-alert": "off",
-    "func-names": "off"
+    "func-names": "off",
+    "react/jsx-props-no-spreading": "off"
   },
   "globals": {
     "window": true,

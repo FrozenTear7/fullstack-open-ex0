@@ -21,9 +21,7 @@ const createBlog = async (blog) => {
 }
 
 const deleteBlog = async (id) => {
-  const res = await axios.delete(`${baseUrl}/${id}`)
-
-  return res.data
+  await axios.delete(`${baseUrl}/${id}`)
 }
 
 export default { getAllBlogs, updateBlog, createBlog, deleteBlog }

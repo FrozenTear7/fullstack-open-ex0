@@ -1,15 +1,11 @@
-import { SET_USER, REMOVE_USER } from '../types/userTypes'
+import { INIT_USERS } from '../types/userTypes'
 
-const initialState = JSON.parse(
-  window.localStorage.getItem('loggedBlogappUser')
-)
+const initialState = []
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case SET_USER:
+    case INIT_USERS:
       return action.data
-    case REMOVE_USER:
-      return null
     default:
       return state
   }

@@ -1,23 +1,23 @@
-import { SET_USER, REMOVE_USER } from '../types/userTypes'
-import loginService from '../services/login'
+import { INIT_USERS } from '../types/userTypes'
+import userService from '../services/users'
+import { setNotification } from './notificationActions'
 
-export const loginUser = (username, password) => {
+export const initUsers = () => {
   return async (dispatch) => {
-    const user = await loginService.login({ username, password })
+    try {
+      const users = await userService.getAllUsers()
 
-    window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
-
-    dispatch({
-      type: SET_USER,
-      data: user,
-    })
-  }
-}
-
-export const logoutUser = () => {
-  window.localStorage.clear('loggedBlogappUser')
-
-  return {
-    type: REMOVE_USER,
+      dispatch({
+        type: INIT_USERS,
+        data: users,
+      })
+    } catch (error) {
+      dispatch(
+        setNotification({
+          message: error.response.data.error,
+          isPositive: false,
+        })
+      )
+    }
   }
 }

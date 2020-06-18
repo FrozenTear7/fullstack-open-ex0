@@ -3,12 +3,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import Togglable from './Togglable'
 import { updateBlog, deleteBlog } from '../actions/blogActions'
-import { setNotification } from '../actions/notificationActions'
 
 const Blog = ({ blog }) => {
   const dispatch = useDispatch()
 
-  const { id: userId } = useSelector((state) => state.user)
+  const { id: userId } = useSelector((state) => state.login)
 
   const blogStyle = {
     paddingTop: 10,
@@ -19,36 +18,12 @@ const Blog = ({ blog }) => {
   }
 
   const handleLikeBlog = () => {
-    try {
-      dispatch(updateBlog({ ...blog, likes: blog.likes + 1 }))
-
-      setNotification({
-        message: 'Successfully liked the blog',
-        isPositive: true,
-      })
-    } catch (error) {
-      setNotification({
-        message: error.response.data.error,
-        isPositive: false,
-      })
-    }
+    dispatch(updateBlog({ ...blog, likes: blog.likes + 1 }))
   }
 
   const handleDeleteBlog = () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      try {
-        dispatch(deleteBlog(blog.id))
-
-        setNotification({
-          message: 'Successfully deleted the blog',
-          isPositive: true,
-        })
-      } catch (error) {
-        setNotification({
-          message: error.response.data.error,
-          isPositive: false,
-        })
-      }
+      dispatch(deleteBlog(blog.id))
     }
   }
 

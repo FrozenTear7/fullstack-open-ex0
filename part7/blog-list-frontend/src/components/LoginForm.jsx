@@ -1,44 +1,31 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useDispatch } from 'react-redux'
-import { loginUser } from '../actions/userActions'
+import { loginUser } from '../actions/loginActions'
+import { useField } from '../hooks'
 
 const LoginForm = () => {
   const dispatch = useDispatch()
 
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const { clear: clearUsername, ...username } = useField('text')
+  const { clear: clearPassword, ...password } = useField('password')
 
   const handleLogin = (event) => {
     event.preventDefault()
 
-    dispatch(loginUser(username, password))
+    dispatch(loginUser(username.value, password.value))
 
-    setUsername('')
-    setPassword('')
+    clearUsername('')
+    clearPassword('')
   }
 
   return (
     <div>
       <form id="login-form" onSubmit={handleLogin}>
         <div>
-          username:{' '}
-          <input
-            id="username"
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
+          username: <input {...username} />
         </div>
         <div>
-          password:{' '}
-          <input
-            id="password"
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
+          password: <input {...password} />
         </div>
         <button id="login-button" type="submit">
           login

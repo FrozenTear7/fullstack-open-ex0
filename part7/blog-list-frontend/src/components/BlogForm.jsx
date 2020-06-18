@@ -1,43 +1,36 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useDispatch } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 import { createBlog } from '../actions/blogActions'
-import { setNotification } from '../actions/notificationActions'
+import { useField } from '../hooks'
 
 const BlogForm = () => {
   const dispatch = useDispatch()
+  const history = useHistory()
 
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
+  const { clear: clearTitle, ...title } = useField('text')
+  const { clear: clearAuthor, ...author } = useField('text')
+  const { clear: clearUrl, ...url } = useField('text')
 
-  const handleCreateBlog = (event) => {
+  const handleCreateBlog = async (event) => {
     event.preventDefault()
 
-    try {
-      const blog = {
-        title,
-        author,
-        url,
-      }
-
-      dispatch(createBlog(blog))
-
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-
-      setNotification({
-        message: `Successfully created blog: ${blog.title}`,
-        isPositive: true,
-      })
-
-      // if (blogFormRef.current) blogFormRef.current.toggleVisibility()
-    } catch (error) {
-      setNotification({
-        message: error.response.data.error,
-        isPositive: false,
-      })
+    const blog = {
+      title: title.value,
+      author: author.value,
+      url: url.value,
     }
+
+    try {
+      await dispatch(createBlog(blog))
+
+      clearTitle()
+      clearAuthor()
+      clearUrl()
+
+      history.push('/blogs')
+      // eslint-disable-next-line no-empty
+    } catch (error) {}
   }
 
   return (
@@ -45,34 +38,13 @@ const BlogForm = () => {
       <h2>create new</h2>
       <form id="blog-form" onSubmit={handleCreateBlog}>
         <div>
-          title:{' '}
-          <input
-            id="title"
-            type="text"
-            value={title}
-            name="Title"
-            onChange={({ target }) => setTitle(target.value)}
-          />
+          title: <input {...title} />
         </div>
         <div>
-          author:{' '}
-          <input
-            id="author"
-            type="text"
-            value={author}
-            name="Author"
-            onChange={({ target }) => setAuthor(target.value)}
-          />
+          author: <input {...author} />
         </div>
         <div>
-          url:{' '}
-          <input
-            id="url"
-            type="text"
-            value={url}
-            name="Url"
-            onChange={({ target }) => setUrl(target.value)}
-          />
+          url: <input {...url} />
         </div>
         <button id="button-create-blog" type="submit">
           create blog
