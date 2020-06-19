@@ -6,6 +6,8 @@
   "author": "Paweł Mendroch",
   "license": "MIT",
   "dependencies": {
+    "@apollo/client": "^3.0.0-rc.6",
+    "graphql": "^15.1.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.0"

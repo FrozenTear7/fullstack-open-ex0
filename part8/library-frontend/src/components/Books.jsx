@@ -1,11 +1,16 @@
 import React from 'react'
+import { useQuery } from '@apollo/client'
+import { ALL_BOOKS } from '../queries/bookQueries'
 
 const Books = ({ show }) => {
+  const { data } = useQuery(ALL_BOOKS)
+  let books = []
+
+  if (data) books = data.allBooks
+
   if (!show) {
     return null
   }
-
-  const books = []
 
   return (
     <div>

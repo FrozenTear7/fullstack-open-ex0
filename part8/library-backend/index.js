@@ -126,7 +126,7 @@ const resolvers = {
     authorCount: () => authors.length,
     allBooks: (root, args) => {
       // Ugly but works I guess
-      if (args) {
+      if (args.author || args.genre) {
         return books.filter((book) => {
           if (args.author && args.genre) {
             if (book.author === args.author && book.genres.includes(args.genre))
@@ -163,7 +163,6 @@ const resolvers = {
     },
     editAuthor: (root, args) => {
       let updatedAuthor = authors.find((author) => author.name === args.name)
-      console.log(updatedAuthor)
 
       if (!updatedAuthor) return null
 
