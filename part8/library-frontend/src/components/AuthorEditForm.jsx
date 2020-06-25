@@ -17,7 +17,9 @@ const AuthorEditForm = ({ show, authors }) => {
   const submit = async (event) => {
     event.preventDefault()
 
-    editAuthor({ variables: { name, setBornTo: +born } })
+    editAuthor({
+      variables: { name: name || authors[0].name, setBornTo: +born },
+    })
 
     setName('')
     setBorn('')
@@ -26,13 +28,26 @@ const AuthorEditForm = ({ show, authors }) => {
   return (
     <div>
       <form onSubmit={submit}>
-        <select value={name} onChange={({ target }) => setName(target.value)}>
+        name:
+        <select
+          value={name}
+          onChange={({ target }) => {
+            setName(target.value)
+          }}
+        >
+          {' '}
+          {/* <option value="grapefruit">Grapefruit</option>
+          <option value="lime">Lime</option>
+          <option value="coconut">Coconut</option>
+          <option value="mango">Mango</option> */}
           {authors.map((author) => (
-            <option value={author.name}>{author.name}</option>
+            <option key={author.name} value={author.name}>
+              {author.name}
+            </option>
           ))}
         </select>
         <div>
-          born
+          born:
           <input
             value={born}
             onChange={({ target }) => setBorn(target.value)}
