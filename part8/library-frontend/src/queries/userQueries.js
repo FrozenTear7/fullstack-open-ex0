@@ -7,3 +7,12 @@ export const LOGIN_USER = gql`
     }
   }
 `
+
+export const GET_USER = gql`
+  query {
+    me {
+      username
+      favoriteGenre
+    }
+  }
+`
