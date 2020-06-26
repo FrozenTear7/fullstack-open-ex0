@@ -1,17 +1,29 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useQuery } from '@apollo/client'
-import { ALL_BOOKS } from '../queries/bookQueries'
+import { ALL_BOOKS, ALL_GENRES } from '../queries/bookQueries'
 
 const Books = ({ show }) => {
   const [filter, setFilter] = useState('')
 
-  const { data } = useQuery(ALL_BOOKS)
-  let books = []
+  const { loading: genresLoading, data: genres } = useQuery(ALL_GENRES)
 
-  if (data) books = data.allBooks
+  const { loading: booksLoading, data: books, refetch: loadBooks } = useQuery(
+    ALL_BOOKS,
+    {
+      variables: { genre: filter },
+    }
+  )
 
-  if (!show || !books) {
+  useEffect(() => {
+    loadBooks()
+  }, [filter, loadBooks])
+
+  if (!show) {
     return null
+  }
+
+  if (booksLoading || genresLoading) {
+    return <div>Loading...</div>
   }
 
   return (
@@ -24,9 +36,7 @@ const Books = ({ show }) => {
 
       <select value={filter} onChange={({ target }) => setFilter(target.value)}>
         <option value="">No filter</option>
-        {Array.from(
-          new Set(books.reduce((acc, book) => [...acc, ...book.genres], [])) // convert to Set to remove duplicates
-        ).map((genre) => (
+        {genres.allGenres.map((genre) => (
           <option key={genre} value={genre}>
             {genre}
           </option>
@@ -40,12 +50,12 @@ const Books = ({ show }) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {books
-            .filter((book) => {
-              if ((filter && book.genres.includes(filter)) || !filter)
-                return book
-              return null
-            })
+          {books.allBooks
+            // .filter((book) => {
+            //   if ((filter && book.genres.includes(filter)) || !filter)
+            //     return book
+            //   return null
+            // })
             .map((a) => (
               <tr key={a.title}>
                 <td>{a.title}</td>

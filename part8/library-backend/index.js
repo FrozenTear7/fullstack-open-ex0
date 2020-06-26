@@ -59,8 +59,9 @@ const typeDefs = gql`
   type Query {
     bookCount: Int!
     authorCount: Int!
-    allBooks(author: String, genre: String): [Book!]!
+    allBooks(author: String, genre: String): [Book]!
     allAuthors: [AuthorsBooks]!
+    allGenres: [String]!
     me: User
   }
 
@@ -69,7 +70,7 @@ const typeDefs = gql`
       title: String!
       author: String!
       published: Int!
-      genres: [String!]!
+      genres: [String]!
     ): Book
     editAuthor(name: String, setBornTo: Int): Author
     createUser(username: String!, favoriteGenre: String!): User
@@ -81,24 +82,32 @@ const resolvers = {
   Query: {
     bookCount: async () => {
       const books = await Book.find({})
-      console.log(books)
       return books.length
     },
     authorCount: async () => {
       const authors = await Author.find({})
-      console.log(authors)
       return authors.length
     },
-    allBooks: async () => {
-      const books = await Book.find({}).populate('author', { name: 1 })
-      return books
+    allBooks: (root, args) => {
+      let findParams = {}
+
+      if (args.genre)
+        findParams = { ...findParams, genres: { $in: [args.genre] } }
+
+      return Book.find(findParams).populate('author', { name: 1 })
     },
-    allAuthors: async () => {
-      const authors = await Author.aggregate([
+    allAuthors: () => {
+      return Author.aggregate([
         { $match: {} },
         { $project: { name: 1, born: 1, bookCount: { $size: '$books' } } },
       ])
-      return authors
+    },
+    allGenres: async (root, args) => {
+      const genres = await Book.find({})
+
+      return Array.from(
+        new Set(genres.reduce((acc, book) => [...acc, ...book.genres], []))
+      )
     },
     me: (root, args, context) => {
       return context.currentUser
