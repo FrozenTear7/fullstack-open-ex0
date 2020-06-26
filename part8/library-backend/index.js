@@ -6,7 +6,8 @@ import Author from './models/author.js'
 import Book from './models/book.js'
 import User from './models/user.js'
 
-const { ApolloServer, UserInputError, gql } = apollo
+const { ApolloServer, UserInputError, PubSub, gql } = apollo
+const pubsub = new PubSub()
 
 mongoose.set('useFindAndModify', false)
 mongoose.set('useCreateIndex', true)
@@ -76,6 +77,10 @@ const typeDefs = gql`
     createUser(username: String!, favoriteGenre: String!): User
     login(username: String!, password: String!): Token
   }
+
+  type Subscription {
+    bookAdded: Book!
+  }
 `
 
 const resolvers = {
@@ -102,7 +107,7 @@ const resolvers = {
         { $project: { name: 1, born: 1, bookCount: { $size: '$books' } } },
       ])
     },
-    allGenres: async (root, args) => {
+    allGenres: async () => {
       const genres = await Book.find({})
 
       return Array.from(
@@ -138,7 +143,11 @@ const resolvers = {
         })
       }
 
-      return book.populate('author', { name: 1, born: 1 }).execPopulate()
+      book = await book.populate('author', { name: 1, born: 1 }).execPopulate()
+
+      pubsub.publish('BOOK_ADDED', { bookAdded: book })
+
+      return book
     },
     editAuthor: async (root, args, context) => {
       if (!context.currentUser) throw new UserInputError('user not authorized')
@@ -182,6 +191,11 @@ const resolvers = {
       return { value: jwt.sign(userForToken, JWT_SECRET) }
     },
   },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator(['BOOK_ADDED']),
+    },
+  },
 }
 
 const server = new ApolloServer({
@@ -199,6 +213,7 @@ const server = new ApolloServer({
   },
 })
 
-server.listen().then(({ url }) => {
+server.listen().then(({ url, subscriptionsUrl }) => {
   console.log(`Server ready at ${url}`)
+  console.log(`Subscriptions ready at ${subscriptionsUrl}`)
 })

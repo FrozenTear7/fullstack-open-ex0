@@ -7,7 +7,8 @@ const Books = ({ show }) => {
 
   const { loading: genresLoading, data: genres } = useQuery(ALL_GENRES)
 
-  const { loading: booksLoading, data: books, refetch: loadBooks } = useQuery(
+  // eslint-disable-next-line prefer-const
+  let { loading: booksLoading, data: books, refetch: loadBooks } = useQuery(
     ALL_BOOKS,
     {
       variables: { genre: filter },
