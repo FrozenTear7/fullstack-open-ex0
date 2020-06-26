@@ -28,25 +28,15 @@ const App = () => {
   }
 
   const updateCacheWith = (addedBook) => {
-    try {
-      console.log(addedBook)
-      const includedIn = (set, object) =>
-        set.map((p) => p.id).includes(object.id)
-
-      const dataInStore = client.readQuery({
-        query: ALL_BOOKS,
-        variables: { genre: '' },
-      })
-      if (!includedIn(dataInStore.allBooks, addedBook)) {
-        client.writeQuery({
-          query: ALL_BOOKS,
-          variables: { genre: '' },
-          data: { allBooks: dataInStore.allBooks.concat(addedBook) },
-        })
-      }
-    } catch (error) {
-      console.log(error)
-    }
+    const dataInStore = client.readQuery({
+      query: ALL_BOOKS,
+      variables: { genre: '' },
+    })
+    client.writeQuery({
+      query: ALL_BOOKS,
+      variables: { genre: '' },
+      data: { allBooks: dataInStore.allBooks.concat(addedBook) },
+    })
   }
 
   useSubscription(BOOK_ADDED, {
