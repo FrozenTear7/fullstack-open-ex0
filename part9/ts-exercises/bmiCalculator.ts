@@ -17,7 +17,7 @@ const parseBmiArguments = (args: Array<string>): BodyValues => {
   }
 }
 
-const calculateBmi = (a: number, b: number): string => {
+export const calculateBmi = (a: number, b: number): string => {
   const bmi = b / Math.pow(a / 100, 2)
 
   if (bmi < 15) return 'Very severely underweight'
@@ -27,7 +27,7 @@ const calculateBmi = (a: number, b: number): string => {
   else if (bmi >= 25 && bmi < 30) return 'Overweight'
   else if (bmi >= 30 && bmi < 35) return 'Obese Class I (Moderately obese)'
   else if (bmi >= 35 && bmi < 40) return 'Obese Class II (Severely obese)'
-  else if (bmi >= 40) return 'Obese Class III (Very severely obese)'
+  else return 'Obese Class III (Very severely obese)'
 }
 
 try {

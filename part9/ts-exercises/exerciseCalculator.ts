@@ -51,7 +51,7 @@ const getRating = (avg: number, target: number): Rating => {
       ratingValue: 2,
       ratingMsg: okMsg,
     }
-  else if (avg > target + 1)
+  else
     return {
       ratingValue: 3,
       ratingMsg: niceMsg,
@@ -82,7 +82,6 @@ const calculateExercises = (
 try {
   const { exerciseHours, target } = parseExerciseArguments(process.argv)
   console.log(calculateExercises(exerciseHours, target))
-  //   console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2))
 } catch (e) {
   console.log('Error, something bad happened, message: ', e.message)
 }
