@@ -1,7 +1,7 @@
-interface ExerciseValues {
-  exerciseHours: Array<number>
-  target: number
-}
+// interface ExerciseValues {
+//   exerciseHours: Array<number>
+//   target: number
+// }
 
 interface ExercisesResult {
   periodLength: number
@@ -18,23 +18,23 @@ interface Rating {
   ratingMsg: string
 }
 
-const parseExerciseArguments = (args: Array<string>): ExerciseValues => {
-  if (args.length < 4) throw new Error('Not enough arguments')
+// const parseExerciseArguments = (args: Array<string>): ExerciseValues => {
+//   if (args.length < 4) throw new Error('Not enough arguments')
 
-  const [target, ...exerciseHours] = args.slice(2).map(Number)
+//   const [target, ...exerciseHours] = args.slice(2).map(Number)
 
-  console.log(exerciseHours)
-  console.log(target)
+//   console.log(exerciseHours)
+//   console.log(target)
 
-  if (!exerciseHours.some(isNaN) && !isNaN(target)) {
-    return {
-      exerciseHours,
-      target,
-    }
-  } else {
-    throw new Error('Provided values were not numbers!')
-  }
-}
+//   if (!exerciseHours.some(isNaN) && !isNaN(target)) {
+//     return {
+//       exerciseHours,
+//       target,
+//     }
+//   } else {
+//     throw new Error('Provided values were not numbers!')
+//   }
+// }
 
 const getRating = (avg: number, target: number): Rating => {
   const badMsg = 'BRUH',
@@ -58,7 +58,7 @@ const getRating = (avg: number, target: number): Rating => {
     }
 }
 
-const calculateExercises = (
+export const calculateExercises = (
   exerciseHours: Array<number>,
   target: number
 ): ExercisesResult => {
@@ -79,9 +79,9 @@ const calculateExercises = (
   }
 }
 
-try {
-  const { exerciseHours, target } = parseExerciseArguments(process.argv)
-  console.log(calculateExercises(exerciseHours, target))
-} catch (e) {
-  console.log('Error, something bad happened, message: ', e.message)
-}
+// try {
+//   const { exerciseHours, target } = parseExerciseArguments(process.argv)
+//   console.log(calculateExercises(exerciseHours, target))
+// } catch (e) {
+//   console.log('Error, something bad happened, message: ', e.message)
+// }
