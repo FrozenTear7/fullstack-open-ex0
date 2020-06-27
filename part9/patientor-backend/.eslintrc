@@ -26,7 +26,8 @@
     ],
     "no-case-declarations": 0,
     "quotes": ["error", "single"],
-    "semi": ["error", "never"]
+    "semi": ["error", "never"],
+    "@typescript-eslint/restrict-plus-operands": "off"
   },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
