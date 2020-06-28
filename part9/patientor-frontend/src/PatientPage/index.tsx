@@ -1,20 +1,16 @@
 import React from 'react'
-import { Icon } from 'semantic-ui-react'
+import { Icon, List } from 'semantic-ui-react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import { apiBaseUrl } from '../constants'
-import { useStateValue, addPatientDetails } from '../state'
-import { Patient, Gender } from '../types'
-
-type PatientPageProps = {
-  rating: number
-  showText: boolean
-}
+import { useStateValue, addPatientDetails, setDiagnosesList } from '../state'
+import { Patient, Gender, Diagnosis } from '../types'
+import EntryComponent from './EntryComponent'
 
 const PatientPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
 
-  const [{ patients }, dispatch] = useStateValue()
+  const [{ patients, diagnoses }, dispatch] = useStateValue()
 
   const patient = patients[id]
 
@@ -24,22 +20,36 @@ const PatientPage: React.FC = () => {
         const { data: patientDetailsFromApi } = await axios.get<Patient>(
           `${apiBaseUrl}/patients/${id}`
         )
-        console.log(patientDetailsFromApi)
         dispatch(addPatientDetails(patientDetailsFromApi))
       } catch (e) {
         console.error(e)
       }
     }
+    fetchPatientDetails()
+    // if (!patient) fetchPatientDetails()
+  }, [dispatch, id])
 
-    if (!patient) fetchPatientDetails()
-  }, [dispatch, id, patient])
+  React.useEffect(() => {
+    const fetchDiagnoses = async () => {
+      try {
+        const { data: diagnosesFromApi } = await axios.get<Diagnosis[]>(
+          'http://localhost:3001/api/diagnoses'
+        )
+        dispatch(setDiagnosesList(diagnosesFromApi))
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
+    fetchDiagnoses()
+  }, [dispatch])
 
   const getGenderIcon = (gender: Gender) => {
     switch (gender) {
       case Gender.Male:
-        return <Icon name="male" />
+        return <Icon name="mars" />
       case Gender.Female:
-        return <Icon name="female" />
+        return <Icon name="venus" />
       case Gender.Other:
         return <Icon name="neuter" />
       default:
@@ -47,7 +57,7 @@ const PatientPage: React.FC = () => {
     }
   }
 
-  if (!patient) return null
+  while (!patient || !diagnoses) return null
 
   return (
     <div>
@@ -55,8 +65,20 @@ const PatientPage: React.FC = () => {
         {patient.name} {getGenderIcon(patient.gender)}
       </h2>
       {patient.ssn && <div>ssn: {patient.ssn}</div>}
-      {patient.dateOfBirth && <div>date of birth: {patient.dateOfBirth}</div>}
       <div>occupation: {patient.occupation}</div>
+      <br />
+      {patient.entries && patient.entries.length > 0 && (
+        <div>
+          <h4>entries</h4>
+          <List divided relaxed>
+            {patient.entries.map((entry) => (
+              <List.Item key={entry.id}>
+                <EntryComponent entry={entry} diagnoses={diagnoses} />
+              </List.Item>
+            ))}
+          </List>
+        </div>
+      )}
     </div>
   )
 }
