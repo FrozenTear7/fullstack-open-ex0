@@ -33,3 +33,18 @@ export const StateProvider: React.FC<StateProviderProps> = ({
   )
 }
 export const useStateValue = () => useContext(StateContext)
+
+export const setPatientList = (patientListFromApi: Array<Patient>): Action => {
+  return {
+    type: 'SET_PATIENT_LIST',
+    payload: patientListFromApi,
+  }
+}
+
+export const addNewPatient = (newPatient: Patient): Action => {
+  return { type: 'ADD_PATIENT', payload: newPatient }
+}
+
+export const addPatientDetails = (patientDetailsFromApi: Patient): Action => {
+  return { type: 'ADD_PATIENT', payload: patientDetailsFromApi }
+}
