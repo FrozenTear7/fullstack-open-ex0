@@ -28,7 +28,7 @@ const calculateRating = (avg: number, target: number): Rating => {
   }
 }
 
-const calculateExercises = (
+export const calculateExercises = (
   target: number,
   exerciseData: Array<number>
 ): CalculatedData => {

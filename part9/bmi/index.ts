@@ -1,7 +1,9 @@
+import { calculateExercises } from './exerciseCalculator'
 import { calculateBmi } from './bmiCalculator'
 import express from 'express'
 
 const app = express()
+app.use(express.json())
 
 app.get('/hello', (_req, res) => {
   res.send('Hello Full Stack!')
@@ -18,6 +20,29 @@ app.get('/bmi', (req, res) => {
       height: height,
       calculateBmi: calculateBmi(Number(height), Number(weight)),
     })
+  }
+})
+
+app.post('/exercises', (req, res) => {
+  const { daily_exercises: dailyExercises, target } = req.body
+  console.log(dailyExercises)
+  console.log(target)
+
+  if (!target || !dailyExercises) {
+    res.send({
+      error: 'parameters missing',
+    })
+  } else if (
+    isNaN(target) ||
+    !Array.isArray(dailyExercises) ||
+    dailyExercises.some((x: String) => isNaN(Number(x)))
+  ) {
+    res.send({
+      error: 'malformatted parameters',
+    })
+  } else {
+    const result = calculateExercises(Number(target), dailyExercises)
+    res.send(result)
   }
 })
 
